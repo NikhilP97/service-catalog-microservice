@@ -58,11 +58,11 @@ export class ServicesService {
             .createQueryBuilder('service')
             .leftJoin('service.versions', 'version')
             .select('service.*')
-            .addSelect('COUNT(version.version_id)::int', 'no_of_versions')
-            .where('service.service_id = :serviceId', { serviceId })
+            .addSelect('COUNT(version.id)::int', 'no_of_versions')
+            .where('service.id = :serviceId', { serviceId })
             .andWhere('service.deleted_at IS NULL')
             .andWhere('version.deleted_at IS NULL')
-            .groupBy('service.service_id')
+            .groupBy('service.id')
             .getRawOne();
 
         if (isEmptyValue(service)) {
@@ -91,10 +91,10 @@ export class ServicesService {
             .createQueryBuilder('service')
             .leftJoin('service.versions', 'version')
             .select('service.*')
-            .addSelect('COUNT(version.version_id)::int', 'no_of_versions')
+            .addSelect('COUNT(version.id)::int', 'no_of_versions')
             .where('service.deleted_at IS NULL')
             .andWhere('version.deleted_at IS NULL')
-            .groupBy('service.service_id');
+            .groupBy('service.id');
 
         // Apply search term filter if provided
         if (searchTerm) {
@@ -115,8 +115,8 @@ export class ServicesService {
             this.serviceRepository
                 .createQueryBuilder('service')
                 .leftJoin('service.versions', 'version')
-                .addSelect('COUNT(version.version_id) ::int', 'no_of_versions')
-                .groupBy('service.service_id')
+                .addSelect('COUNT(version.id) ::int', 'no_of_versions')
+                .groupBy('service.id')
                 .getCount(),
         ]);
 
@@ -151,7 +151,7 @@ export class ServicesService {
         const { serviceId } = requestParams;
 
         const serviceEntity = await this.serviceRepository.findOne({
-            where: { service_id: serviceId, deleted_at: IsNull() },
+            where: { id: serviceId, deleted_at: IsNull() },
         });
 
         if (!serviceEntity) {
@@ -169,7 +169,7 @@ export class ServicesService {
         const { serviceId } = requestParams;
 
         const serviceToDelete = await this.serviceRepository.findOne({
-            where: { service_id: serviceId, deleted_at: IsNull() },
+            where: { id: serviceId, deleted_at: IsNull() },
             relations: ['versions'],
         });
 

@@ -28,7 +28,7 @@ export class VersionsService {
     ) {}
 
     private async checkIfServiceExists(serviceId: string): Promise<void> {
-        // Check if the service exists by counting versions with the service_id
+        // Check if the service exists by counting versions with the service.id
         const serviceExists = await this.versionRepository
             .createQueryBuilder('version')
             .where('version.service_id = :service_id', {
@@ -57,7 +57,7 @@ export class VersionsService {
 
         const version = this.versionRepository.create({
             ...requestBody,
-            service: { service_id: serviceId }, // Associate version with the service
+            service: { id: serviceId }, // Associate version with the service
         });
 
         return await this.versionRepository.save(version);
@@ -75,7 +75,7 @@ export class VersionsService {
         const versions = await this.versionRepository
             .createQueryBuilder('versions')
             .leftJoinAndSelect('versions.service', 'service')
-            .where('versions.service.service_id = :serviceId', { serviceId })
+            .where('versions.service.id = :serviceId', { serviceId })
             .andWhere('versions.deleted_at IS NULL')
             .getMany();
 
@@ -99,7 +99,7 @@ export class VersionsService {
 
         const version = await this.versionRepository
             .createQueryBuilder('versions')
-            .where('versions.version_id = :versionId', { versionId })
+            .where('versions.id = :versionId', { versionId })
             .andWhere('versions.deleted_at IS NULL')
             .getOne();
 
@@ -126,7 +126,7 @@ export class VersionsService {
         const { versionId } = requestParams;
 
         const version = await this.versionRepository.findOne({
-            where: { version_id: versionId, deleted_at: IsNull() },
+            where: { id: versionId, deleted_at: IsNull() },
         });
 
         if (!version) {
@@ -148,7 +148,7 @@ export class VersionsService {
 
         // Check if the version exists
         const version = await this.versionRepository.findOne({
-            where: { version_id: versionId, deleted_at: IsNull() },
+            where: { id: versionId, deleted_at: IsNull() },
         });
 
         if (!version) {

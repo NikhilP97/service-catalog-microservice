@@ -41,7 +41,7 @@ export class ServicesController {
         const serviceEntity = await this.servicesService.createService(reqBody);
 
         const response: CreateServiceResponseDto = {
-            service_entity: serviceEntity,
+            entity: serviceEntity,
         };
 
         return plainToInstance(CreateServiceResponseDto, response);
@@ -54,7 +54,7 @@ export class ServicesController {
         const servicesData = await this.servicesService.getServices(reqQuery);
 
         const response: ListServicesResponseDto = {
-            service_entities: servicesData.services,
+            entities: servicesData.services,
             meta: {
                 pagination: servicesData.pagination,
             },
@@ -71,7 +71,7 @@ export class ServicesController {
             await this.servicesService.getServiceById(reqParams);
 
         const response: GetServiceResponseDto = {
-            service_entity: serviceEntity,
+            entity: serviceEntity,
         };
 
         return plainToInstance(GetServiceResponseDto, response);
@@ -92,7 +92,7 @@ export class ServicesController {
         );
 
         const response: UpdateServiceResponseDto = {
-            service_entity: updatedServiceEntity,
+            entity: updatedServiceEntity,
         };
 
         return plainToInstance(UpdateServiceResponseDto, response);

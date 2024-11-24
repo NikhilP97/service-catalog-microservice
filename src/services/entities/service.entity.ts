@@ -16,7 +16,7 @@ import { Page } from 'src/types/common.dto';
 @Index('idx_service_name_description', ['name', 'description']) // Composite index
 export class ServiceEntity {
     @PrimaryGeneratedColumn('uuid')
-    service_id: string;
+    id: string;
 
     @Index()
     @Column({ type: 'varchar', length: 255 })

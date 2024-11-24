@@ -1,7 +1,8 @@
-import { Expose, Type } from 'class-transformer';
-import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import { Expose } from 'class-transformer';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 import { ServiceRequestParams } from 'src/services/dto/shared';
+import { EntityResponse, ListEntitiesResponse } from 'src/types/common.dto';
 
 export class VersionRequestParams extends ServiceRequestParams {
     @IsNotEmpty()
@@ -19,14 +20,9 @@ export class VersionRequestBody {
     readonly overview: string;
 }
 
-export class ServiceDetailsForVersionEntity {
-    @Expose()
-    readonly service_id: string;
-}
-
 export class VersionResponse {
     @Expose()
-    readonly version_id: string;
+    readonly id: string;
 
     @Expose()
     readonly name: string;
@@ -35,16 +31,14 @@ export class VersionResponse {
     readonly overview: string;
 }
 
-export class VersionResponseDto {
-    @Expose()
-    @ValidateNested()
-    @Type(() => VersionResponse)
-    readonly version_entity: VersionResponse;
+export class VersionResponseDto extends EntityResponse<VersionResponse> {
+    constructor() {
+        super(VersionResponse);
+    }
 }
 
-export class VersionResponseListDto {
-    @Expose()
-    @ValidateNested()
-    @Type(() => VersionResponse)
-    readonly version_entities: VersionResponse[];
+export class VersionResponseListDto extends ListEntitiesResponse<VersionResponse> {
+    constructor() {
+        super(VersionResponse);
+    }
 }

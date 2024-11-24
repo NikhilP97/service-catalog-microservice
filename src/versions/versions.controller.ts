@@ -43,7 +43,7 @@ export class VersionsController {
         );
 
         const response: CreateVersionResponseDto = {
-            version_entity: versionEntity,
+            entity: versionEntity,
         };
 
         return plainToInstance(CreateVersionResponseDto, response);
@@ -57,7 +57,7 @@ export class VersionsController {
             await this.versionsService.getVersionsByServiceId(reqParams);
 
         const response: ListVersionsResponseDto = {
-            version_entities: versionEntities,
+            entities: versionEntities,
         };
 
         return plainToInstance(ListVersionsResponseDto, response);
@@ -71,7 +71,7 @@ export class VersionsController {
             await this.versionsService.getVersionById(reqParams);
 
         const response: GetVersionResponseDto = {
-            version_entity: versionEntity,
+            entity: versionEntity,
         };
 
         return plainToInstance(GetVersionResponseDto, response);
@@ -88,7 +88,7 @@ export class VersionsController {
         );
 
         const response: UpdateVersionResponseDto = {
-            version_entity: versionEntity,
+            entity: versionEntity,
         };
 
         return plainToInstance(UpdateVersionResponseDto, response);
