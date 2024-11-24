@@ -1,10 +1,11 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
     IsEnum,
     IsNotEmpty,
     IsNumber,
     IsOptional,
     IsString,
+    Min,
 } from 'class-validator';
 
 enum OrderValues {
@@ -28,6 +29,7 @@ export class Page {
 
 export class MetaData {
     @Expose()
+    @Type(() => Page)
     readonly pagination: Page;
 }
 
@@ -35,12 +37,13 @@ export class PaginationSearchSort {
     @IsOptional()
     @IsNotEmpty()
     @IsNumber()
-    readonly 'page[number]'?: number;
+    @Min(1, { message: 'page number must be at least 1' })
+    readonly 'page[number]'?: number = 1;
 
     @IsOptional()
     @IsNotEmpty()
     @IsNumber()
-    readonly 'page[size]'?: number;
+    readonly 'page[size]'?: number = 20;
 
     @IsOptional()
     @IsNotEmpty()
@@ -50,5 +53,5 @@ export class PaginationSearchSort {
     @IsOptional()
     @IsNotEmpty()
     @IsEnum(OrderValues)
-    readonly order?: 'ASC' | 'DESC' = 'ASC';
+    readonly order?: 'ASC' | 'DESC' = 'DESC';
 }

@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types'; // TODO: Change to swagger library
+import { PartialType } from '@nestjs/swagger';
 
 import {
     ServiceRequestBody,
@@ -6,10 +6,8 @@ import {
     ServiceResponseDto,
 } from './shared';
 
-export class UpdateServiceRequestParamsDto extends ServiceRequestParams {}
+export class UpdateServiceReqParamsDto extends ServiceRequestParams {}
 
-export class UpdateServiceRequestBodyDto extends PartialType(
-    ServiceRequestBody,
-) {}
+export class UpdateServiceReqBodyDto extends PartialType(ServiceRequestBody) {}
 
 export class UpdateServiceResponseDto extends ServiceResponseDto {}

@@ -6,9 +6,11 @@
 import {
     ClassSerializerInterceptor,
     INestApplication,
+    ValidationPipe,
     VersioningType,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 export function setup(app: INestApplication): void {
     /**
@@ -21,9 +23,29 @@ export function setup(app: INestApplication): void {
         type: VersioningType.URI,
     });
 
+    app.useGlobalPipes(
+        new ValidationPipe({
+            whitelist: true,
+            forbidNonWhitelisted: true,
+            transform: true,
+            // disableErrorMessages: true, // mark true in production environments if needed
+        }),
+    );
+
+    // This ensures that only the exposed fields are sent back in the response and all other fields are stripped
     app.useGlobalInterceptors(
         new ClassSerializerInterceptor(app.get(Reflector), {
             strategy: 'excludeAll',
         }),
     );
+
+    // Swagger
+    const config = new DocumentBuilder()
+        .setTitle('Service Catalog')
+        .setDescription('The service catalog API definitions')
+        .setVersion('1.0.0')
+        .addTag('service-catalog')
+        .build();
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api-docs', app, documentFactory);
 }

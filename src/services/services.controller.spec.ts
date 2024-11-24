@@ -4,10 +4,10 @@ import { createMock } from '@golevelup/ts-jest';
 import { ServicesController } from './services.controller';
 // import { ServicesService } from './services.service';
 import {
-    CreateServiceRequestDto,
-    GetServiceRequestDto,
-    ListServicesRequestDto,
-    UpdateServiceRequestBodyDto,
+    CreateServiceReqBodyDto,
+    GetServiceReqParamsDto,
+    ListServicesReqQueryDto,
+    UpdateServiceReqBodyDto,
 } from './dto';
 
 describe('ServicesController', () => {
@@ -40,7 +40,7 @@ describe('ServicesController', () => {
     describe('Create a new service', () => {
         it('Should return the details of the new service', async () => {
             // Arrange
-            const createServiceReq: CreateServiceRequestDto = {
+            const createServiceReq: CreateServiceReqBodyDto = {
                 name: 'New Service',
                 description: 'New Service Description',
             };
@@ -62,7 +62,7 @@ describe('ServicesController', () => {
         /*
         it('Should throw a not found if service entity details are not returned', async () => {
             // Arrange
-            const createServiceReq: CreateServiceRequestDto = {};
+            const createServiceReq: CreateServiceReqBodyDto = {};
 
             // Act
             const result = await servicesController.create(createServiceReq);
@@ -83,7 +83,7 @@ describe('ServicesController', () => {
     describe('Get list of service', () => {
         it('Should return the list of services', async () => {
             // Arrange
-            const queryParams: ListServicesRequestDto = {};
+            const queryParams: ListServicesReqQueryDto = {};
 
             // Act
             const result = await servicesController.findServices(queryParams);
@@ -114,7 +114,7 @@ describe('ServicesController', () => {
     describe('Get one a service by service ID', () => {
         it('Should return the details of the service', async () => {
             // Arrange
-            const queryParams: GetServiceRequestDto = {
+            const queryParams: GetServiceReqParamsDto = {
                 serviceId: '1923012',
             };
 
@@ -137,11 +137,11 @@ describe('ServicesController', () => {
     describe('Update one a service by service ID and request body', () => {
         it('Should return the details of the service', async () => {
             // Arrange
-            const queryParams: GetServiceRequestDto = {
+            const queryParams: GetServiceReqParamsDto = {
                 serviceId: '1923012',
             };
 
-            const updateServiceReqBody: UpdateServiceRequestBodyDto = {
+            const updateServiceReqBody: UpdateServiceReqBodyDto = {
                 name: 'New Service',
                 description: 'New Service Description',
             };
@@ -167,7 +167,7 @@ describe('ServicesController', () => {
     describe('Delete one a service by service ID ', () => {
         it('Should delete the service', async () => {
             // Arrange
-            const queryParams: GetServiceRequestDto = {
+            const queryParams: GetServiceReqParamsDto = {
                 serviceId: '2830120',
             };
 

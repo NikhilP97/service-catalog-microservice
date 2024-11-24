@@ -1,26 +1,184 @@
-import { Injectable } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { validateOrReject } from 'class-validator';
+import { IsNull, Repository } from 'typeorm';
 
-import { CreateServiceRequestDto, UpdateServiceRequestBodyDto } from './dto';
+import { isEmptyValue } from 'src/utility/validations';
+import {
+    ServiceEntitiesWithPagination,
+    ServiceEntity,
+} from './entities/service.entity';
+import {
+    CreateServiceReqBodyDto,
+    DeleteServiceReqParamsDto,
+    GetServiceReqParamsDto,
+    ListServicesReqQueryDto,
+    UpdateServiceReqBodyDto,
+    UpdateServiceReqParamsDto,
+} from './dto';
 
 @Injectable()
 export class ServicesService {
-    create(createServiceReqDto: CreateServiceRequestDto) {
-        return 'This action adds a new service';
+    constructor(
+        @InjectRepository(ServiceEntity)
+        private readonly serviceRepository: Repository<ServiceEntity>,
+    ) {}
+
+    async createService(
+        requestBody: CreateServiceReqBodyDto,
+    ): Promise<ServiceEntity> {
+        await validateOrReject(requestBody);
+
+        const newService = this.serviceRepository.create({
+            ...requestBody,
+            versions: [
+                {
+                    name: 'Initial Version',
+                    overview: `Initial version of ${requestBody.name}`,
+                },
+            ],
+        });
+        newService.no_of_versions = 1;
+
+        return await this.serviceRepository.save(newService);
     }
 
-    findAll() {
-        return 'This action fins all services';
+    async getServiceById(
+        requestParams: GetServiceReqParamsDto,
+    ): Promise<ServiceEntity> {
+        await validateOrReject(requestParams);
+
+        const { serviceId } = requestParams;
+
+        const service = await this.serviceRepository
+            .createQueryBuilder('service')
+            .leftJoin('service.versions', 'version')
+            .select('service.*')
+            .addSelect('COUNT(version.version_id)::int', 'no_of_versions')
+            .where('service.service_id = :serviceId', { serviceId })
+            .andWhere('service.deleted_at IS NULL')
+            .andWhere('version.deleted_at IS NULL')
+            .groupBy('service.service_id')
+            .getRawOne();
+
+        if (isEmptyValue(service)) {
+            throw new NotFoundException('Service not found');
+        }
+
+        return service;
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} service`;
+    async getServices(
+        requestParams: ListServicesReqQueryDto | undefined,
+    ): Promise<ServiceEntitiesWithPagination> {
+        if (requestParams) {
+            await validateOrReject(requestParams);
+        }
+
+        const {
+            'page[number]': pageNumber = 1,
+            'page[size]': pageSize = 20,
+            searchTerm,
+            order = 'DESC',
+            sortBy = 'created_at',
+        } = requestParams!;
+
+        const queryBuilder = this.serviceRepository
+            .createQueryBuilder('service')
+            .leftJoin('service.versions', 'version')
+            .select('service.*')
+            .addSelect('COUNT(version.version_id)::int', 'no_of_versions')
+            .where('service.deleted_at IS NULL')
+            .andWhere('version.deleted_at IS NULL')
+            .groupBy('service.service_id');
+
+        // Apply search term filter if provided
+        if (searchTerm) {
+            queryBuilder.where(
+                `service.name ILIKE :searchTerm OR service.description ILIKE :searchTerm`,
+                { searchTerm: `%${searchTerm}%` },
+            );
+        }
+
+        // Apply sorting by 'sortBy' and 'order' fields
+        queryBuilder.orderBy(`service.${sortBy}`, order, 'NULLS LAST');
+
+        // Implement pagination
+        queryBuilder.skip((pageNumber - 1) * pageSize).take(pageSize);
+
+        const [services, totalItems] = await Promise.all([
+            queryBuilder.getRawMany(),
+            this.serviceRepository
+                .createQueryBuilder('service')
+                .leftJoin('service.versions', 'version')
+                .addSelect('COUNT(version.version_id) ::int', 'no_of_versions')
+                .groupBy('service.service_id')
+                .getCount(),
+        ]);
+
+        if (isEmptyValue(services)) {
+            throw new NotFoundException('No Services found');
+        }
+
+        const totalPages = Math.ceil(totalItems / pageSize);
+
+        const pagination = {
+            cur_page: pageNumber,
+            page_size: pageSize,
+            total_pages: totalPages,
+            total_items: totalItems,
+        };
+
+        return { services, pagination };
     }
 
-    update(id: number, updateServiceReqBodyDto: UpdateServiceRequestBodyDto) {
-        return `This action updates a #${id} service`;
+    async updateService(
+        requestParams: UpdateServiceReqParamsDto,
+        updateData: UpdateServiceReqBodyDto,
+    ): Promise<ServiceEntity> {
+        await validateOrReject(requestParams);
+
+        if (isEmptyValue(updateData)) {
+            throw new BadRequestException('Update data cannot be empty');
+        }
+
+        await validateOrReject(updateData);
+
+        const { serviceId } = requestParams;
+
+        const serviceEntity = await this.serviceRepository.findOne({
+            where: { service_id: serviceId, deleted_at: IsNull() },
+        });
+
+        if (!serviceEntity) {
+            throw new NotFoundException('Service not found');
+        }
+
+        await this.serviceRepository.update(serviceId, updateData);
+
+        return await this.getServiceById(requestParams);
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} service`;
+    async deleteService(
+        requestParams: DeleteServiceReqParamsDto,
+    ): Promise<void> {
+        const { serviceId } = requestParams;
+
+        const serviceToDelete = await this.serviceRepository.findOne({
+            where: { service_id: serviceId, deleted_at: IsNull() },
+            relations: ['versions'],
+        });
+
+        if (!serviceToDelete) {
+            throw new NotFoundException('Service not found');
+        }
+
+        await this.serviceRepository.softRemove(serviceToDelete);
+
+        return;
     }
 }

@@ -1,15 +1,18 @@
 export {
-    CreateServiceRequestDto,
+    CreateServiceReqBodyDto,
     CreateServiceResponseDto,
 } from './create-service.dto';
 export {
-    ListServicesRequestDto,
+    ListServicesReqQueryDto,
     ListServicesResponseDto,
 } from './list-services.dto';
-export { GetServiceRequestDto, GetServiceResponseDto } from './get-service.dto';
 export {
-    UpdateServiceRequestParamsDto,
-    UpdateServiceRequestBodyDto,
+    GetServiceReqParamsDto,
+    GetServiceResponseDto,
+} from './get-service.dto';
+export {
+    UpdateServiceReqParamsDto,
+    UpdateServiceReqBodyDto,
     UpdateServiceResponseDto,
 } from './update-service.dto';
-export { DeleteServiceRequestDto } from './delete-service.dto';
+export { DeleteServiceReqParamsDto } from './delete-service.dto';
