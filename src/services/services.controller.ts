@@ -7,116 +7,104 @@ import {
     Param,
     Delete,
     Query,
+    BadRequestException,
+    HttpCode,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 
 import {
+    ListServicesReqQueryDto,
     ListServicesResponseDto,
-    ListServicesRequestDto,
-    CreateServiceRequestDto,
+    CreateServiceReqBodyDto,
     CreateServiceResponseDto,
-    GetServiceRequestDto,
     GetServiceResponseDto,
-    UpdateServiceRequestParamsDto,
-    UpdateServiceRequestBodyDto,
+    UpdateServiceReqParamsDto,
+    UpdateServiceReqBodyDto,
     UpdateServiceResponseDto,
-    DeleteServiceRequestDto,
+    DeleteServiceReqParamsDto,
 } from './dto';
-
-// private readonly servicesService: ServicesService
-// import { ServicesService } from './services.service';
+import { ServicesService } from './services.service';
+import { ServiceRequestParams } from './dto/shared';
+import { isEmptyValue } from 'src/utility/validations';
 
 @Controller({
     path: 'services',
     version: '1',
 })
 export class ServicesController {
-    constructor() {}
+    constructor(private readonly servicesService: ServicesService) {}
 
     @Post()
     async createService(
-        @Body() createServiceReqDto: CreateServiceRequestDto,
+        @Body() reqBody: CreateServiceReqBodyDto,
     ): Promise<CreateServiceResponseDto> {
-        // if (isEmpty(newServiceEntity)) {
-        //     throw new NotFoundException('Service not found');
-        // }
+        const serviceEntity = await this.servicesService.createService(reqBody);
 
-        return plainToInstance(CreateServiceResponseDto, {
-            service_entity: {
-                ...createServiceReqDto,
-                service_id: '1',
-            },
-        });
+        const response: CreateServiceResponseDto = {
+            service_entity: serviceEntity,
+        };
+
+        return plainToInstance(CreateServiceResponseDto, response);
     }
 
     @Get()
     async findServices(
-        @Query() query?: ListServicesRequestDto,
+        @Query() reqQuery?: ListServicesReqQueryDto,
     ): Promise<ListServicesResponseDto> {
-        // if (isEmpty(serviceEntities)) {
-        //     throw new NotFoundException('No Services found');
-        // }
+        const servicesData = await this.servicesService.getServices(reqQuery);
 
-        return plainToInstance(ListServicesResponseDto, {
-            service_entities: [
-                {
-                    name: 'New Service',
-                    description: 'New Service Description',
-                    service_id: '1',
-                },
-            ],
+        const response: ListServicesResponseDto = {
+            service_entities: servicesData.services,
             meta: {
-                pagination: {
-                    cur_page: 1,
-                    page_size: 1,
-                    total_pages: 1,
-                    total_items: 1,
-                },
+                pagination: servicesData.pagination,
             },
-        });
+        };
+
+        return plainToInstance(ListServicesResponseDto, response);
     }
 
     @Get(':serviceId')
     async getService(
-        @Param() params: GetServiceRequestDto,
+        @Param() reqParams: ServiceRequestParams,
     ): Promise<GetServiceResponseDto> {
-        // if (isEmpty(serviceEntity)) {
-        //     throw new NotFoundException('Service not found');
-        // }
+        const serviceEntity =
+            await this.servicesService.getServiceById(reqParams);
 
-        return plainToInstance(GetServiceResponseDto, {
-            service_entity: {
-                name: 'New Service',
-                description: 'New Service Description',
-                service_id: params.serviceId,
-            },
-        });
+        const response: GetServiceResponseDto = {
+            service_entity: serviceEntity,
+        };
+
+        return plainToInstance(GetServiceResponseDto, response);
     }
 
     @Patch(':serviceId')
     async updateService(
-        @Param() params: UpdateServiceRequestParamsDto,
-        @Body() updateServiceReqBodyDto: UpdateServiceRequestBodyDto,
+        @Param() reqParams: UpdateServiceReqParamsDto,
+        @Body() reqBody: UpdateServiceReqBodyDto,
     ): Promise<UpdateServiceResponseDto> {
-        // if (isEmpty(serviceEntity)) {
-        //     throw new NotFoundException('Service not found');
-        // }
+        if (isEmptyValue(reqBody)) {
+            throw new BadRequestException('Update data cannot be empty');
+        }
 
-        return plainToInstance(UpdateServiceResponseDto, {
-            service_entity: {
-                ...updateServiceReqBodyDto,
-                service_id: params.serviceId,
-            },
-        });
+        const updatedServiceEntity = await this.servicesService.updateService(
+            reqParams,
+            reqBody,
+        );
+
+        const response: UpdateServiceResponseDto = {
+            service_entity: updatedServiceEntity,
+        };
+
+        return plainToInstance(UpdateServiceResponseDto, response);
     }
 
     @Delete(':serviceId')
+    @HttpCode(204)
     async deleteService(
-        @Param() params: DeleteServiceRequestDto,
+        @Param() reqParams: DeleteServiceReqParamsDto,
     ): Promise<void> {
-        // if (isEmpty(serviceEntity)) {
-        //     throw new NotFoundException('Service not found');
-        // }
+        await this.servicesService.deleteService(reqParams);
+
         return;
     }
 }

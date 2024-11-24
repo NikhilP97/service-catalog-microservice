@@ -1,5 +1,5 @@
 import { ServiceRequestParams, ServiceResponseDto } from './shared';
 
-export class GetServiceRequestDto extends ServiceRequestParams {}
+export class GetServiceReqParamsDto extends ServiceRequestParams {}
 
 export class GetServiceResponseDto extends ServiceResponseDto {}
