@@ -108,3 +108,19 @@ export class ListEntitiesResponse<DataObject> {
         });
     }
 }
+
+export class APISuccessResponse<DataObject> {
+    data: DataObject;
+
+    status_code: number;
+}
+
+export class APIErrorResponse {
+    statusCode: number;
+
+    title: string;
+
+    type: string;
+
+    details?: undefined | string[];
+}

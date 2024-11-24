@@ -4,13 +4,15 @@
  */
 
 import {
-    ClassSerializerInterceptor,
     INestApplication,
     ValidationPipe,
     VersioningType,
 } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { HttpAdapterHost, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+import { TransformResponseInterceptor } from './interceptors/transform-response.interceptor';
+import { CatchEveryErrorFilter } from './filters/exception.filter';
 
 export function setup(app: INestApplication): void {
     /**
@@ -25,19 +27,23 @@ export function setup(app: INestApplication): void {
 
     app.useGlobalPipes(
         new ValidationPipe({
-            whitelist: true,
             forbidNonWhitelisted: true,
             transform: true,
             // disableErrorMessages: true, // mark true in production environments if needed
         }),
     );
 
-    // This ensures that only the exposed fields are sent back in the response and all other fields are stripped
+    /**
+     * This ensures that only the exposed fields are sent back in the response and all other fields are stripped
+     * It then adds some top level keys like 'data', 'statusCode', etc. to the top level API response
+     */
     app.useGlobalInterceptors(
-        new ClassSerializerInterceptor(app.get(Reflector), {
+        new TransformResponseInterceptor(app.get(Reflector), {
             strategy: 'excludeAll',
         }),
     );
+
+    app.useGlobalFilters(new CatchEveryErrorFilter(app.get(HttpAdapterHost)));
 
     // Swagger
     const config = new DocumentBuilder()
