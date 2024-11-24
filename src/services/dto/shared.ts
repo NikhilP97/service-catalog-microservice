@@ -1,14 +1,17 @@
-import { Expose, Type } from 'class-transformer';
+import { Expose } from 'class-transformer';
 import {
     IsEnum,
     IsNotEmpty,
     IsOptional,
     IsString,
     IsUUID,
-    ValidateNested,
 } from 'class-validator';
 
-import { MetaData, PaginationSearchSort } from '../../types/common.dto';
+import {
+    EntityResponse,
+    ListEntitiesResponse,
+    PaginationSearchSort,
+} from '../../types/common.dto';
 
 enum SortByValues {
     name = 'name',
@@ -46,27 +49,20 @@ export class ServiceResponse {
     readonly description: string;
 
     @Expose()
-    readonly service_id: string;
+    readonly id: string;
 
     @Expose()
     readonly no_of_versions: number;
 }
 
-export class ServiceResponseDto {
-    @Expose()
-    @ValidateNested()
-    @Type(() => ServiceResponse)
-    readonly service_entity: ServiceResponse;
+export class ServiceResponseDto extends EntityResponse<ServiceResponse> {
+    constructor() {
+        super(ServiceResponse);
+    }
 }
 
-export class ServiceResponseListDto {
-    @Expose()
-    @ValidateNested()
-    @Type(() => ServiceResponse)
-    readonly service_entities: ServiceResponse[];
-
-    @Expose()
-    @ValidateNested()
-    @Type(() => MetaData)
-    readonly meta: MetaData;
+export class ServiceResponseListDto extends ListEntitiesResponse<ServiceResponse> {
+    constructor() {
+        super(ServiceResponse);
+    }
 }

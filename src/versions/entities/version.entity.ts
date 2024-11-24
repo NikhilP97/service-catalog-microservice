@@ -15,7 +15,7 @@ import { ServiceEntity } from '../../services/entities/service.entity';
 @Entity('versions')
 export class VersionsEntity {
     @PrimaryGeneratedColumn('uuid')
-    version_id: string;
+    id: string;
 
     @Column({ type: 'varchar', length: 255 })
     name: string;

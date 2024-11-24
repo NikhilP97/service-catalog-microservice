@@ -54,7 +54,7 @@ describe('ServicesController', () => {
             expect(result).toEqual({
                 service_entity: {
                     ...createServiceReq,
-                    service_id: '1',
+                    id: '1',
                 },
             });
         });
@@ -72,7 +72,7 @@ describe('ServicesController', () => {
             expect(result).toEqual({
                 service_entity: {
                     ...createServiceReq,
-                    service_id: 1,
+                    id: 1,
                 },
             });
         });
@@ -95,7 +95,7 @@ describe('ServicesController', () => {
                     {
                         name: 'New Service',
                         description: 'New Service Description',
-                        service_id: '1',
+                        id: '1',
                     },
                 ],
                 meta: {
@@ -127,7 +127,7 @@ describe('ServicesController', () => {
                 service_entity: {
                     name: 'New Service',
                     description: 'New Service Description',
-                    service_id: queryParams.serviceId,
+                    id: queryParams.serviceId,
                 },
             });
         });
@@ -157,7 +157,7 @@ describe('ServicesController', () => {
             expect(result).toEqual({
                 service_entity: {
                     ...updateServiceReqBody,
-                    service_id: queryParams.serviceId,
+                    id: queryParams.serviceId,
                 },
             });
         });
