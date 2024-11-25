@@ -10,6 +10,18 @@ import {
     BadRequestException,
     HttpCode,
 } from '@nestjs/common';
+import {
+    ApiBadRequestResponse,
+    ApiBearerAuth,
+    ApiCreatedResponse,
+    ApiInternalServerErrorResponse,
+    ApiNoContentResponse,
+    ApiNotFoundResponse,
+    ApiOkResponse,
+    ApiOperation,
+    ApiTags,
+    ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
 import {
@@ -24,9 +36,30 @@ import {
     DeleteServiceReqParamsDto,
 } from './dto';
 import { ServicesService } from './services.service';
-import { ServiceRequestParams } from './dto/shared';
+import {
+    APIServiceListResponse,
+    APIServiceResponse,
+    ServiceRequestParams,
+} from './dto/shared';
 import { isEmptyValue } from 'src/utility/validations';
+import { APIErrorResponse } from 'src/types/common.dto';
+import {
+    APIInternalServerErrorResponse,
+    APINotFoundErrorResponse,
+    APIUnauthenticatedExceptionResponse,
+} from 'src/types/swagger.dto';
 
+@ApiTags('Services')
+@ApiBearerAuth()
+@ApiBadRequestResponse({
+    type: APIErrorResponse,
+})
+@ApiUnauthorizedResponse({
+    type: APIUnauthenticatedExceptionResponse,
+})
+@ApiInternalServerErrorResponse({
+    type: APIInternalServerErrorResponse,
+})
 @Controller({
     path: 'services',
     version: '1',
@@ -34,6 +67,16 @@ import { isEmptyValue } from 'src/utility/validations';
 export class ServicesController {
     constructor(private readonly servicesService: ServicesService) {}
 
+    @ApiOperation({
+        summary: 'Creates a new service',
+        description:
+            'Creates a new service entity and a corresponding version entity which serves as the default initial version',
+    })
+    @ApiCreatedResponse({
+        type: APIServiceResponse,
+    })
+
+    // Function definition
     @Post()
     async createService(
         @Body() reqBody: CreateServiceReqBodyDto,
@@ -47,6 +90,19 @@ export class ServicesController {
         return plainToInstance(CreateServiceResponseDto, response);
     }
 
+    @ApiOperation({
+        summary: 'Fetches a list of information about services',
+        description:
+            'Returns information about the services and supports filtering, pagination and sorting',
+    })
+    @ApiOkResponse({
+        type: APIServiceListResponse,
+    })
+    @ApiNotFoundResponse({
+        type: APINotFoundErrorResponse,
+    })
+
+    // Function definition
     @Get()
     async findServices(
         @Query() reqQuery?: ListServicesReqQueryDto,
@@ -63,6 +119,19 @@ export class ServicesController {
         return plainToInstance(ListServicesResponseDto, response);
     }
 
+    @ApiOperation({
+        summary: 'Get the information about a particular service',
+        description:
+            'Returns information about a particular service by the service id',
+    })
+    @ApiOkResponse({
+        type: APIServiceResponse,
+    })
+    @ApiNotFoundResponse({
+        type: APINotFoundErrorResponse,
+    })
+
+    // Function definition
     @Get(':serviceId')
     async getService(
         @Param() reqParams: ServiceRequestParams,
@@ -77,6 +146,19 @@ export class ServicesController {
         return plainToInstance(GetServiceResponseDto, response);
     }
 
+    @ApiOperation({
+        summary: 'Update the information about a particular service',
+        description:
+            'Updates the information about a particular service by the service id',
+    })
+    @ApiOkResponse({
+        type: APIServiceResponse,
+    })
+    @ApiNotFoundResponse({
+        type: APINotFoundErrorResponse,
+    })
+
+    // Function definition
     @Patch(':serviceId')
     async updateService(
         @Param() reqParams: UpdateServiceReqParamsDto,
@@ -98,6 +180,20 @@ export class ServicesController {
         return plainToInstance(UpdateServiceResponseDto, response);
     }
 
+    @ApiOperation({
+        summary:
+            'Deletes the information about a particular service and related versions',
+        description:
+            'When a particular service is deleted, all versions related to that service will also be deleted',
+    })
+    @ApiNoContentResponse({
+        description: 'Service deleted successfully',
+    })
+    @ApiNotFoundResponse({
+        type: APINotFoundErrorResponse,
+    })
+
+    // Function definition
     @Delete(':serviceId')
     @HttpCode(204)
     async deleteService(

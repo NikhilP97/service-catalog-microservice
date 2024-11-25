@@ -14,8 +14,15 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TransformResponseInterceptor } from './interceptors/transform-response.interceptor';
 import { CatchEveryErrorFilter } from './filters/exception.filter';
 
+const DEVELOPMENT_URL = 'http://localhost:3000';
+
 export function setup(app: INestApplication): void {
     const appReflector = app.get(Reflector);
+    /**
+     * Enable CORs and whitelist development URL that the Swagger UI will access
+     */
+    app.enableCors({ origin: DEVELOPMENT_URL });
+
     /**
      * Enable global prefix for all registered routes and add versioning
      * Version numbers are handled at the controller and route level
@@ -46,12 +53,25 @@ export function setup(app: INestApplication): void {
 
     app.useGlobalFilters(new CatchEveryErrorFilter(app.get(HttpAdapterHost)));
 
-    // Swagger
+    // Swagger API Documentation
     const config = new DocumentBuilder()
         .setTitle('Service Catalog')
         .setDescription('The service catalog API definitions')
         .setVersion('1.0.0')
-        .addTag('service-catalog')
+        .addTag(
+            'Services',
+            'Handles CRUD operations for the Services and CRUD operations for Versions related to a particular service entity ',
+        )
+        .addTag(
+            'Auth',
+            'Handles JWT token generation and exposes endpoints to test authentication and RBAC authorization',
+        )
+        .addBearerAuth({
+            type: 'http',
+            scheme: 'bearer',
+            in: 'header',
+        })
+        .addServer(DEVELOPMENT_URL)
         .build();
     const documentFactory = () => SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api-docs', app, documentFactory);

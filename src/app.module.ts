@@ -4,14 +4,11 @@ import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ServicesModule } from './services/services.module';
 import { VersionsModule } from './versions/versions.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard, RolesGuard } from './guards';
 
-// TODO: Remove app controller and service
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -33,9 +30,7 @@ import { AuthGuard, RolesGuard } from './guards';
         }),
         AuthModule,
     ],
-    controllers: [AppController],
     providers: [
-        AppService,
         {
             provide: APP_GUARD,
             useClass: AuthGuard,
