@@ -10,7 +10,7 @@ import {
     JoinColumn,
 } from 'typeorm';
 
-import { ServiceEntity } from '../../services/entities/service.entity';
+import { ServiceEntity } from 'src/services/entities/service.entity';
 
 @Entity('versions')
 export class VersionsEntity {

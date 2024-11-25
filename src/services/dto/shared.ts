@@ -11,7 +11,7 @@ import {
     EntityResponse,
     ListEntitiesResponse,
     PaginationSearchSort,
-} from '../../types/common.dto';
+} from 'src/types/common.dto';
 
 enum SortByValues {
     name = 'name',

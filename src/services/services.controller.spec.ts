@@ -1,20 +1,54 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { createMock } from '@golevelup/ts-jest';
+import { createMock, DeepMocked } from '@golevelup/ts-jest';
+import { BadRequestException } from '@nestjs/common';
 
+import { ServiceRequestParams } from './dto/shared';
+import { ServiceEntity } from './entities/service.entity';
 import { ServicesController } from './services.controller';
-// import { ServicesService } from './services.service';
+import { ServicesService } from './services.service';
 import {
-    CreateServiceReqBodyDto,
-    GetServiceReqParamsDto,
     ListServicesReqQueryDto,
+    ListServicesResponseDto,
+    CreateServiceReqBodyDto,
+    CreateServiceResponseDto,
+    UpdateServiceReqParamsDto,
     UpdateServiceReqBodyDto,
+    UpdateServiceResponseDto,
+    DeleteServiceReqParamsDto,
 } from './dto';
+
+const mockServiceEntity: ServiceEntity = {
+    id: '1',
+    name: 'Test Service',
+    description: 'Mock service description',
+    no_of_versions: 1,
+    versions: [],
+    created_at: new Date(),
+    updated_at: new Date(),
+    deleted_at: null,
+};
+const mockServicesResponse: ListServicesResponseDto = {
+    entities: [mockServiceEntity],
+    meta: {
+        pagination: {
+            total_items: 1,
+            cur_page: 1,
+            page_size: 10,
+            total_pages: 1,
+        },
+    },
+};
+const mockCreateServiceResponse: CreateServiceResponseDto = {
+    entity: mockServiceEntity,
+};
+const mockUpdateServiceResponse: UpdateServiceResponseDto = {
+    entity: mockServiceEntity,
+};
 
 describe('ServicesController', () => {
     let servicesController: ServicesController;
-    // let servicesService: DeepMocked<ServicesService>;
+    let servicesService: DeepMocked<ServicesService>;
 
-    // Set up testbed before each test
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [ServicesController],
@@ -23,159 +57,129 @@ describe('ServicesController', () => {
             .compile();
 
         servicesController = module.get<ServicesController>(ServicesController);
-        // servicesService = module.get(ServicesService);
+        servicesService = module.get(ServicesService);
     });
 
-    // Clean up mocks after each test
     afterEach(() => {
         jest.clearAllMocks();
     });
 
-    // Sanity test
-    it('should be defined', () => {
+    it('Should be defined', () => {
         expect(servicesController).toBeDefined();
     });
 
-    // Test for POST /services
-    describe('Create a new service', () => {
-        it('Should return the details of the new service', async () => {
+    describe('createService', () => {
+        it('Should create a service', async () => {
             // Arrange
-            const createServiceReq: CreateServiceReqBodyDto = {
-                name: 'New Service',
-                description: 'New Service Description',
+            const reqBody: CreateServiceReqBodyDto = {
+                name: 'Test Service',
+                description: 'Mock service description',
             };
+            servicesService.createService.mockResolvedValue(mockServiceEntity);
 
             // Act
-            const result =
-                await servicesController.createService(createServiceReq);
+            const result = await servicesController.createService(reqBody);
 
             // Assert
-            // expect(userService.findAll).toHaveBeenCalled();
-            expect(result).toEqual({
-                service_entity: {
-                    ...createServiceReq,
-                    id: '1',
-                },
-            });
-        });
-
-        /*
-        it('Should throw a not found if service entity details are not returned', async () => {
-            // Arrange
-            const createServiceReq: CreateServiceReqBodyDto = {};
-
-            // Act
-            const result = await servicesController.create(createServiceReq);
-
-            // Assert
-            // expect(userService.findAll).toHaveBeenCalled();
-            expect(result).toEqual({
-                service_entity: {
-                    ...createServiceReq,
-                    id: 1,
-                },
-            });
-        });
-         */
-    });
-
-    // Test for GET /services
-    describe('Get list of service', () => {
-        it('Should return the list of services', async () => {
-            // Arrange
-            const queryParams: ListServicesReqQueryDto = {};
-
-            // Act
-            const result = await servicesController.findServices(queryParams);
-
-            // Assert
-            // expect(userService.findAll).toHaveBeenCalled();
-            expect(result).toEqual({
-                service_entities: [
-                    {
-                        name: 'New Service',
-                        description: 'New Service Description',
-                        id: '1',
-                    },
-                ],
-                meta: {
-                    pagination: {
-                        cur_page: 1,
-                        page_size: 1,
-                        total_pages: 1,
-                        total_items: 1,
-                    },
-                },
-            });
+            expect(servicesService.createService).toHaveBeenCalledWith(reqBody);
+            expect(result).toEqual(mockCreateServiceResponse);
         });
     });
 
-    // Test for GET /services/{serviceId}
-    describe('Get one a service by service ID', () => {
-        it('Should return the details of the service', async () => {
+    describe('findServices', () => {
+        it('Should return a list of services', async () => {
             // Arrange
-            const queryParams: GetServiceReqParamsDto = {
-                serviceId: '1923012',
+            const reqQuery: ListServicesReqQueryDto = {
+                'page[number]': 1,
+                'page[size]': 10,
             };
-
-            // Act
-            const result = await servicesController.getService(queryParams);
-
-            // Assert
-            // expect(userService.findAll).toHaveBeenCalled();
-            expect(result).toEqual({
-                service_entity: {
-                    name: 'New Service',
-                    description: 'New Service Description',
-                    id: queryParams.serviceId,
+            servicesService.getServices.mockResolvedValue({
+                services: [mockServiceEntity],
+                pagination: {
+                    total_items: 1,
+                    cur_page: 1,
+                    page_size: 10,
+                    total_pages: 1,
                 },
             });
+
+            // Act
+            const result = await servicesController.findServices(reqQuery);
+
+            // Assert
+            expect(servicesService.getServices).toHaveBeenCalledWith(reqQuery);
+            expect(result).toEqual(mockServicesResponse);
         });
     });
 
-    // Test for PATCH /services/{serviceId}
-    describe('Update one a service by service ID and request body', () => {
-        it('Should return the details of the service', async () => {
+    describe('getService', () => {
+        it('Should return a service by ID', async () => {
             // Arrange
-            const queryParams: GetServiceReqParamsDto = {
-                serviceId: '1923012',
-            };
+            const reqParams: ServiceRequestParams = { serviceId: '1' };
+            servicesService.getServiceById.mockResolvedValue(mockServiceEntity);
 
-            const updateServiceReqBody: UpdateServiceReqBodyDto = {
-                name: 'New Service',
-                description: 'New Service Description',
+            // Act
+            const result = await servicesController.getService(reqParams);
+
+            // Assert
+            expect(servicesService.getServiceById).toHaveBeenCalledWith(
+                reqParams,
+            );
+            expect(result).toEqual({ entity: mockServiceEntity });
+        });
+    });
+
+    describe('updateService', () => {
+        it('Should update a service with valid data', async () => {
+            // Arrange
+            const reqParams: UpdateServiceReqParamsDto = { serviceId: '1' };
+            const reqBody: UpdateServiceReqBodyDto = {
+                name: 'Updated Service',
             };
+            servicesService.updateService.mockResolvedValue(mockServiceEntity);
 
             // Act
             const result = await servicesController.updateService(
-                queryParams,
-                updateServiceReqBody,
+                reqParams,
+                reqBody,
             );
 
             // Assert
-            // expect(userService.findAll).toHaveBeenCalled();
-            expect(result).toEqual({
-                service_entity: {
-                    ...updateServiceReqBody,
-                    id: queryParams.serviceId,
-                },
-            });
+            expect(servicesService.updateService).toHaveBeenCalledWith(
+                reqParams,
+                reqBody,
+            );
+            expect(result).toEqual(mockUpdateServiceResponse);
+        });
+
+        it('Should throw BadRequestException if update data is empty', async () => {
+            // Arrange
+            const reqParams: UpdateServiceReqParamsDto = { serviceId: '1' };
+            const reqBody: UpdateServiceReqBodyDto = {};
+
+            // Act & Assert
+            await expect(
+                servicesController.updateService(reqParams, reqBody),
+            ).rejects.toThrow(
+                new BadRequestException('Update data cannot be empty'),
+            );
+            expect(servicesService.updateService).not.toHaveBeenCalled();
         });
     });
 
-    // Test for DELETE /services/{serviceId}
-    describe('Delete one a service by service ID ', () => {
-        it('Should delete the service', async () => {
+    describe('deleteService', () => {
+        it('Should delete a service by ID', async () => {
             // Arrange
-            const queryParams: GetServiceReqParamsDto = {
-                serviceId: '2830120',
-            };
+            const reqParams: DeleteServiceReqParamsDto = { serviceId: '1' };
+            servicesService.deleteService.mockResolvedValue();
 
             // Act
-            const result = await servicesController.deleteService(queryParams);
+            const result = await servicesController.deleteService(reqParams);
 
             // Assert
-            // expect(userService.findAll).toHaveBeenCalled();
+            expect(servicesService.deleteService).toHaveBeenCalledWith(
+                reqParams,
+            );
             expect(result).toBeUndefined();
         });
     });
