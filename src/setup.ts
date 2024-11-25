@@ -15,6 +15,7 @@ import { TransformResponseInterceptor } from './interceptors/transform-response.
 import { CatchEveryErrorFilter } from './filters/exception.filter';
 
 export function setup(app: INestApplication): void {
+    const appReflector = app.get(Reflector);
     /**
      * Enable global prefix for all registered routes and add versioning
      * Version numbers are handled at the controller and route level
@@ -38,7 +39,7 @@ export function setup(app: INestApplication): void {
      * It then adds some top level keys like 'data', 'statusCode', etc. to the top level API response
      */
     app.useGlobalInterceptors(
-        new TransformResponseInterceptor(app.get(Reflector), {
+        new TransformResponseInterceptor(appReflector, {
             strategy: 'excludeAll',
         }),
     );

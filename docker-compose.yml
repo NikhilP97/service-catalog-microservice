@@ -13,6 +13,8 @@ services:
       - PG_DB=service_catalog_pgdb
       - PG_PORT=5432
       - PG_HOST=database_service
+      - JWT_SECRET=138de783db058ea36340ad69ca8dbb397ca0aa4271f8de3371bd17be309ebd7919cd2de0576703c4604c8aa1b4dc68450b78526659efa885aaf4aa789ad81060
+      - ENABLE_AUTH=false
     depends_on:
       - database_service
 

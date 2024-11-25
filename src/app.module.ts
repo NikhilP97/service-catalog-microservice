@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
@@ -7,11 +8,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ServicesModule } from './services/services.module';
 import { VersionsModule } from './versions/versions.module';
+import { AuthModule } from './auth/auth.module';
+import { AuthGuard, RolesGuard } from './guards';
 
 // TODO: Remove app controller and service
 @Module({
     imports: [
-        ConfigModule.forRoot(),
+        ConfigModule.forRoot({
+            isGlobal: true, // Makes ConfigModule available globally
+        }),
         ServicesModule,
         VersionsModule,
         // NOTE: Does not work if defined outside. CHORE: Debug further
@@ -26,8 +31,19 @@ import { VersionsModule } from './versions/versions.module';
             synchronize: true, // NOTE: disable in production TODO: Use env variable
             namingStrategy: new SnakeNamingStrategy(),
         }),
+        AuthModule,
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [
+        AppService,
+        {
+            provide: APP_GUARD,
+            useClass: AuthGuard,
+        },
+        {
+            provide: APP_GUARD,
+            useClass: RolesGuard,
+        },
+    ],
 })
 export class AppModule {}
