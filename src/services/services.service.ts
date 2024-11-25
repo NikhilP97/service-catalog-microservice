@@ -154,7 +154,7 @@ export class ServicesService {
             where: { id: serviceId, deleted_at: IsNull() },
         });
 
-        if (!serviceEntity) {
+        if (isEmptyValue(serviceEntity)) {
             throw new NotFoundException('Service not found');
         }
 

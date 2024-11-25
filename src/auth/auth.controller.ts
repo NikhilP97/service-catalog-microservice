@@ -1,8 +1,7 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 
-import { Public } from '../decorators/is-public.decorator';
-import { Roles } from '../decorators/roles.decorator';
+import { Roles, Public } from 'src/decorators';
 import { DefinedRoles } from 'src/types/auth.enum';
 import { AuthService } from './auth.service';
 import {

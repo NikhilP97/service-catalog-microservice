@@ -34,7 +34,7 @@ export class ServiceEntity {
 
     @Index()
     @DeleteDateColumn({ nullable: true })
-    deleted_at: Date; // Automatically set null when `softDelete` is called
+    deleted_at: Date | null; // Automatically set null when `softDelete` is called
 
     @OneToMany(() => VersionsEntity, (version) => version.service, {
         cascade: true,
