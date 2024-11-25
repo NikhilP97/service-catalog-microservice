@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import {
     IsEnum,
@@ -10,51 +11,90 @@ import {
 } from 'class-validator';
 
 enum OrderValues {
-    ASC = 'ASC',
-    DESC = 'DESC',
+    asc = 'ASC',
+    desc = 'DESC',
 }
 
 export class Page {
+    @ApiProperty({
+        description: 'The current page of the requested for the entity',
+    })
     @Expose()
     readonly cur_page: number;
 
+    @ApiProperty({
+        description: 'The number of items returned in API response',
+    })
     @Expose()
     readonly page_size: number;
 
+    @ApiProperty({
+        description: 'The total pages for the particular entity',
+    })
     @Expose()
     readonly total_pages: number;
 
+    @ApiProperty({
+        description:
+            'The total items present in the DB for the particular entity',
+    })
     @Expose()
     readonly total_items: number;
 }
 
 export class MetaData {
+    @ApiProperty({
+        description: 'The meta information returned by the API response',
+    })
     @Expose()
     @Type(() => Page)
     readonly pagination: Page;
 }
 
 export class PaginationSearchSort {
+    @ApiProperty({
+        description:
+            'The page number to start searching from. Minimum value should be 1',
+        default: 1,
+        example: 1,
+    })
     @IsOptional()
     @IsNotEmpty()
     @IsNumber()
     @Min(1, { message: 'page number must be at least 1' })
     readonly 'page[number]'?: number = 1;
 
+    @ApiProperty({
+        description: 'The amount of items that the API should fetch',
+        default: 20,
+        example: 20,
+    })
     @IsOptional()
     @IsNotEmpty()
     @IsNumber()
     readonly 'page[size]'?: number = 20;
 
+    @ApiProperty({
+        description:
+            'The search string to filter and search items. For this service, the API searches on the name and description fields',
+        default: '',
+        example: 'Location Service',
+    })
     @IsOptional()
     @IsNotEmpty()
     @IsString()
     readonly searchTerm?: string;
 
+    @ApiProperty({
+        description: 'The order by which the results should be sorted',
+        enum: OrderValues,
+        default: OrderValues.desc,
+        example: OrderValues.desc,
+    })
     @IsOptional()
     @IsNotEmpty()
     @IsEnum(OrderValues)
-    readonly order?: 'ASC' | 'DESC' = 'DESC';
+    readonly order?: OrderValues = OrderValues.desc;
 }
 
 export class EntityResponse<DataObject> {
@@ -110,17 +150,37 @@ export class ListEntitiesResponse<DataObject> {
 }
 
 export class APISuccessResponse<DataObject> {
+    //  @ApiProperty decorator is applied in child classes
     data: DataObject;
 
+    @ApiProperty({
+        description: 'http status code',
+    })
     status_code: number;
 }
 
 export class APIErrorResponse {
+    @ApiProperty({
+        description: 'http status code',
+        example: 400,
+    })
     statusCode: number;
 
+    @ApiProperty({
+        description: 'Human readable message of the error',
+        example: 'Error in input fields',
+    })
     title: string;
 
+    @ApiProperty({
+        description: 'Type of the http exception',
+        example: 'BadRequestException',
+    })
     type: string;
 
+    @ApiProperty({
+        description: 'Details about the error',
+        example: '["username must be contain only letter and numbers"]',
+    })
     details?: undefined | string[];
 }
