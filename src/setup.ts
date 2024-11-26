@@ -87,7 +87,6 @@ export function setup(app: INestApplication): void {
             scheme: 'bearer',
             in: 'header',
         })
-        .addServer(DEVELOPMENT_URL)
         .build();
     const documentFactory = () => SwaggerModule.createDocument(app, config);
     SwaggerModule.setup(SWAGGER_DOCS_ENDPOINT, app, documentFactory);
