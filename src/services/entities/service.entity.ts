@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Column definitions for the services table
+ */
 import {
     PrimaryGeneratedColumn,
     Column,
@@ -10,7 +13,6 @@ import {
 } from 'typeorm';
 
 import { VersionsEntity } from 'src/versions/entities/version.entity';
-import { Page } from 'src/types/common.dto';
 
 @Entity('services')
 @Index('idx_service_name_description', ['name', 'description']) // Composite index
@@ -43,10 +45,4 @@ export class ServiceEntity {
 
     // Calculated property, not persisted in the database
     no_of_versions: number;
-}
-
-export class ServiceEntitiesWithPagination {
-    services: ServiceEntity[];
-
-    pagination: Page;
 }

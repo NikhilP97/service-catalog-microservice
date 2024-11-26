@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Core business logic for the services entity
+ */
 import {
     BadRequestException,
     Injectable,
@@ -7,19 +10,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { validateOrReject } from 'class-validator';
 import { IsNull, Repository } from 'typeorm';
 
-import { isEmptyValue } from 'src/utility/validations';
+import { isEmptyValue } from 'src/utils';
+import { ServiceEntity } from './entities/service.entity';
 import {
     ServiceEntitiesWithPagination,
-    ServiceEntity,
-} from './entities/service.entity';
-import {
-    CreateServiceReqBodyDto,
-    DeleteServiceReqParamsDto,
-    GetServiceReqParamsDto,
-    ListServicesReqQueryDto,
-    UpdateServiceReqBodyDto,
-    UpdateServiceReqParamsDto,
-} from './dto';
+    ServiceListRequestQuery,
+    ServicePartialRequestBodyDto,
+    ServiceRequestBodyDto,
+    ServiceRequestParamsDto,
+} from './dto/services.dto';
 
 @Injectable()
 export class ServicesService {
@@ -29,7 +28,7 @@ export class ServicesService {
     ) {}
 
     async createService(
-        requestBody: CreateServiceReqBodyDto,
+        requestBody: ServiceRequestBodyDto,
     ): Promise<ServiceEntity> {
         await validateOrReject(requestBody);
 
@@ -48,12 +47,11 @@ export class ServicesService {
     }
 
     async getServiceById(
-        requestParams: GetServiceReqParamsDto,
+        requestParams: ServiceRequestParamsDto,
     ): Promise<ServiceEntity> {
         await validateOrReject(requestParams);
 
         const { serviceId } = requestParams;
-
         const service = await this.serviceRepository
             .createQueryBuilder('service')
             .leftJoin('service.versions', 'version')
@@ -73,7 +71,7 @@ export class ServicesService {
     }
 
     async getServices(
-        requestParams: ListServicesReqQueryDto | undefined,
+        requestParams: ServiceListRequestQuery | undefined,
     ): Promise<ServiceEntitiesWithPagination> {
         if (requestParams) {
             await validateOrReject(requestParams);
@@ -86,7 +84,6 @@ export class ServicesService {
             order = 'DESC',
             sortBy = 'created_at',
         } = requestParams!;
-
         const queryBuilder = this.serviceRepository
             .createQueryBuilder('service')
             .leftJoin('service.versions', 'version')
@@ -125,7 +122,6 @@ export class ServicesService {
         }
 
         const totalPages = Math.ceil(totalItems / pageSize);
-
         const pagination = {
             cur_page: pageNumber,
             page_size: pageSize,
@@ -137,8 +133,8 @@ export class ServicesService {
     }
 
     async updateService(
-        requestParams: UpdateServiceReqParamsDto,
-        updateData: UpdateServiceReqBodyDto,
+        requestParams: ServiceRequestParamsDto,
+        updateData: ServicePartialRequestBodyDto,
     ): Promise<ServiceEntity> {
         await validateOrReject(requestParams);
 
@@ -149,7 +145,6 @@ export class ServicesService {
         await validateOrReject(updateData);
 
         const { serviceId } = requestParams;
-
         const serviceEntity = await this.serviceRepository.findOne({
             where: { id: serviceId, deleted_at: IsNull() },
         });
@@ -159,13 +154,10 @@ export class ServicesService {
         }
 
         await this.serviceRepository.update(serviceId, updateData);
-
         return await this.getServiceById(requestParams);
     }
 
-    async deleteService(
-        requestParams: DeleteServiceReqParamsDto,
-    ): Promise<void> {
+    async deleteService(requestParams: ServiceRequestParamsDto): Promise<void> {
         const { serviceId } = requestParams;
 
         const serviceToDelete = await this.serviceRepository.findOne({
@@ -178,7 +170,6 @@ export class ServicesService {
         }
 
         await this.serviceRepository.softRemove(serviceToDelete);
-
         return;
     }
 }

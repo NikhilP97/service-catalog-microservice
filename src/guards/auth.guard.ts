@@ -1,25 +1,21 @@
-import {
-    CanActivate,
-    ExecutionContext,
-    Injectable,
-    UnauthorizedException,
-} from '@nestjs/common';
+/**
+ * @fileoverview Enables Authentication across all endpoints
+ * Checks if authentication is enabled using the environment variable
+ * If a particular route or controller is marked Public(), skips authentication
+ */
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 
 import { IS_PUBLIC_KEY } from 'src/decorators/is-public.decorator';
-import { isAuthEnabled } from 'src/utility/auth';
-
-const UNAUTHENTICATED_MSG = 'User is not authenticated';
+import { isAuthEnabled } from 'src/utils';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
     constructor(
-        private jwtService: JwtService,
+        private authService: AuthService,
         private reflector: Reflector,
-        private configService: ConfigService,
     ) {}
 
     private extractTokenFromHeader(request: Request): string | undefined {
@@ -45,20 +41,8 @@ export class AuthGuard implements CanActivate {
         // Check authentication
         const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromHeader(request);
-
-        if (!token) {
-            throw new UnauthorizedException(UNAUTHENTICATED_MSG);
-        }
-
-        try {
-            const payload = await this.jwtService.verifyAsync(token, {
-                secret: this.configService.get<string>('JWT_SECRET'),
-            });
-
-            request['authInfo'] = payload;
-        } catch {
-            throw new UnauthorizedException(UNAUTHENTICATED_MSG);
-        }
+        const payload = await this.authService.verifyToken(token);
+        request['authInfo'] = payload;
 
         return true;
     }

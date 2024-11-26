@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Main module for the application to mount
+ * All common configs should be authored here
+ */
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
@@ -8,15 +12,17 @@ import { ServicesModule } from './services/services.module';
 import { VersionsModule } from './versions/versions.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard, RolesGuard } from './guards';
+import { AuthService } from './auth/auth.service';
 
 @Module({
     imports: [
-        ConfigModule.forRoot({
-            isGlobal: true, // Makes ConfigModule available globally
-        }),
         ServicesModule,
         VersionsModule,
-        // NOTE: Does not work if defined outside. CHORE: Debug further
+        AuthModule,
+        ConfigModule.forRoot({
+            // Required to access the environment variables in other services
+            isGlobal: true,
+        }),
         TypeOrmModule.forRoot({
             type: process.env.DB_TYPE as any,
             host: process.env.PG_HOST,
@@ -25,12 +31,13 @@ import { AuthGuard, RolesGuard } from './guards';
             password: process.env.PG_PASSWORD,
             database: process.env.PG_DB,
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: true, // NOTE: disable in production TODO: Use env variable
+            // NOTE: should be false in production environment
+            synchronize: process.env.SYNCHRONIZE_DB === 'true',
             namingStrategy: new SnakeNamingStrategy(),
         }),
-        AuthModule,
     ],
     providers: [
+        AuthService, // Needed here since auth guard has a dependency on it
         {
             provide: APP_GUARD,
             useClass: AuthGuard,

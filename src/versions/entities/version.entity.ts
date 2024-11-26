@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Column definitions for the versions table
+ */
 import {
     Entity,
     PrimaryGeneratedColumn,
@@ -35,8 +38,9 @@ export class VersionsEntity {
 
     @Index()
     @ManyToOne(() => ServiceEntity, (service) => service.versions, {
-        onDelete: 'CASCADE',
+        onDelete: 'CASCADE', // ensure related versions are deleted when the service is deleted
     })
-    @JoinColumn({ name: 'service_id' }) // Explicitly define the foreign key name
+    // Explicitly define the foreign key name
+    @JoinColumn({ name: 'service_id' })
     service: ServiceEntity;
 }

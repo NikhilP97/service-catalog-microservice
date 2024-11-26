@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Enables authorization across endpoints using Role based access control
+ * If a route or controller is marked with Roles([]) decorator, the JWT token must contain those roles
+ * The required roles must be a subset of the user provided roles to access the route
+ */
 import {
     Injectable,
     CanActivate,
@@ -6,10 +11,9 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { Roles } from 'src/decorators/roles.decorator';
-import { DefinedRoles } from 'src/types/auth.enum';
-import { isAuthEnabled } from 'src/utility/auth';
-import { isEmptyValue } from 'src/utility/validations';
+import { DefinedRoles } from 'src/constants';
+import { isAuthEnabled, isEmptyValue } from 'src/utils';
+import { Roles } from 'src/decorators';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

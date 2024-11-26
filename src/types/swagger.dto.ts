@@ -1,4 +1,8 @@
+/**
+ * @fileoverview Type definitions used for swagger
+ */
 import { ApiProperty } from '@nestjs/swagger';
+
 import { APIErrorResponse } from './common.dto';
 
 export class APIUnauthenticatedExceptionResponse extends APIErrorResponse {

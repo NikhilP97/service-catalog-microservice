@@ -1,3 +1,9 @@
+/**
+ * @fileoverview This contains the end-to-end tests for the services functionality
+ * Pre-requisite: A running database to connect and test functionality
+ * The test connects to a database passed through a config passed in the TypeOrmModule.forRoot()
+ * After each test the database tables are cleared to ensure independence and deter side effects
+ */
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
@@ -9,7 +15,7 @@ import { ServiceEntity } from '../src/services/entities/service.entity';
 import { VersionsEntity } from 'src/versions/entities/version.entity';
 import { setup } from 'src/setup';
 
-describe('ServicesController (e2e)', () => {
+describe('Services functionality (e2e)', () => {
     let app: INestApplication;
     let serviceRepository: Repository<ServiceEntity>;
 
@@ -27,14 +33,16 @@ describe('ServicesController (e2e)', () => {
                     database: 'test_service_catalog_pgdb',
                     entities: [ServiceEntity, VersionsEntity],
                     logging: false,
-                    synchronize: true, // Automatically sync the schema for the test
+                    // Automatically sync the schema for the test
+                    synchronize: true,
                 }),
-                TypeOrmModule.forFeature([ServiceEntity, VersionsEntity]), // Include the repository for testing
+                // Include the repository for testing
+                TypeOrmModule.forFeature([ServiceEntity, VersionsEntity]),
             ],
         }).compile();
 
         app = moduleFixture.createNestApplication();
-        // This needs to be done to enable global configs like path prefix, filters, pipes, etc.
+        // The setup() method needs to be called to simulate the same conditions and configs that are enabled in the main application
         setup(app);
         await app.init();
 
@@ -54,6 +62,7 @@ describe('ServicesController (e2e)', () => {
         await app.close();
     });
 
+    // Test getting the service information by passing the service ID
     it('should return the service by ID', async () => {
         // Arrange
         const testData = {
@@ -65,15 +74,15 @@ describe('ServicesController (e2e)', () => {
         const createServiceResponse = await request(app.getHttpServer())
             .post('/api/v1/services')
             .send(testData)
-            .expect(201); // Expect HTTP status 201 (Created)
+            .expect(201);
         const createdService = createServiceResponse.body.data.entity;
 
-        // Act: Call the getServiceById endpoint
+        // Act: Call the getServiceById endpoint with the create service response
         const getServiceByIdResponse = await request(app.getHttpServer())
             .get(`/api/v1/services/${createdService.id}`)
             .expect(200);
 
-        // Assert: Validate the response
+        // Assert: Validate the response of getting service info by id
         expect(getServiceByIdResponse.body.data).toEqual({
             entity: {
                 id: createdService.id,
