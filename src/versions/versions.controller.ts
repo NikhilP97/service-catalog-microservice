@@ -1,3 +1,6 @@
+/**
+ * @fileoverview HTTP handles for the version entity
+ */
 import {
     Controller,
     Get,
@@ -23,28 +26,25 @@ import {
 } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
-import { VersionsService } from './versions.service';
-import {
-    CreateVersionReqBodyDto,
-    CreateVersionReqParamsDto,
-    CreateVersionResponseDto,
-    ListVersionsReqParamsDto,
-    ListVersionsResponseDto,
-    GetVersionReqParamsDto,
-    GetVersionResponseDto,
-    UpdateVersionReqBodyDto,
-    UpdateVersionReqParamsDto,
-    UpdateVersionResponseDto,
-    DeleteVersionReqParamsDto,
-} from './dto';
-import { APIErrorResponse } from 'src/types/common.dto';
-import { APIVersionListResponse, APIVersionResponse } from './dto/shared';
 import {
     APIConflictExceptionResponse,
     APIInternalServerErrorResponse,
     APINotFoundErrorResponse,
     APIUnauthenticatedExceptionResponse,
 } from 'src/types/swagger.dto';
+import { APIErrorResponse } from 'src/types/common.dto';
+import { VersionsService } from './versions.service';
+
+import {
+    VersionPartialReqBodyDto,
+    VersionRequestBodyDto,
+    VersionRequestParamsDto,
+    VersionDto,
+    VersionListDto,
+    VersionResponseDto,
+    VersionListResponseDto,
+} from './dto/versions.dto';
+import { ServiceRequestParamsDto } from 'src/services/dto/services.dto';
 
 @ApiTags('Services')
 @ApiBearerAuth()
@@ -71,26 +71,23 @@ export class VersionsController {
         summary: 'Creates a new version for a particular service',
         description: 'Creates a new version for a particular service',
     })
-    @ApiCreatedResponse({
-        type: APIVersionResponse,
-    })
-
-    // Function definition
+    @ApiCreatedResponse({ type: VersionResponseDto })
+    // Implementation details
     @Post()
     async createVersion(
-        @Param() reqParams: CreateVersionReqParamsDto,
-        @Body() reqBody: CreateVersionReqBodyDto,
-    ): Promise<CreateVersionResponseDto> {
+        @Param() reqParams: ServiceRequestParamsDto,
+        @Body() reqBody: VersionRequestBodyDto,
+    ): Promise<VersionDto> {
         const versionEntity = await this.versionsService.createVersion(
             reqParams,
             reqBody,
         );
 
-        const response: CreateVersionResponseDto = {
+        const response: VersionDto = {
             entity: versionEntity,
         };
 
-        return plainToInstance(CreateVersionResponseDto, response);
+        return plainToInstance(VersionDto, response);
     }
 
     @ApiOperation({
@@ -99,23 +96,20 @@ export class VersionsController {
         description:
             'Returns information about the services. Currently does not support filtering, pagination and sorting',
     })
-    @ApiOkResponse({
-        type: APIVersionListResponse,
-    })
-
-    // Function definition
+    @ApiOkResponse({ type: VersionListResponseDto })
+    // Implementation details
     @Get()
     async findAllVersions(
-        @Param() reqParams: ListVersionsReqParamsDto,
-    ): Promise<ListVersionsResponseDto> {
+        @Param() reqParams: ServiceRequestParamsDto,
+    ): Promise<VersionListDto> {
         const versionEntities =
             await this.versionsService.getVersionsByServiceId(reqParams);
 
-        const response: ListVersionsResponseDto = {
+        const response: VersionListDto = {
             entities: versionEntities,
         };
 
-        return plainToInstance(ListVersionsResponseDto, response);
+        return plainToInstance(VersionListDto, response);
     }
 
     @ApiOperation({
@@ -123,23 +117,20 @@ export class VersionsController {
         description:
             'Returns information about a particular version by the version id. Uses service id to check if version is associated with a service',
     })
-    @ApiOkResponse({
-        type: APIVersionResponse,
-    })
-
-    // Function definition
+    @ApiOkResponse({ type: VersionResponseDto })
+    // Implementation details
     @Get(':versionId')
     async findOneVersion(
-        @Param() reqParams: GetVersionReqParamsDto,
-    ): Promise<GetVersionResponseDto> {
+        @Param() reqParams: VersionRequestParamsDto,
+    ): Promise<VersionDto> {
         const versionEntity =
             await this.versionsService.getVersionById(reqParams);
 
-        const response: GetVersionResponseDto = {
+        const response: VersionDto = {
             entity: versionEntity,
         };
 
-        return plainToInstance(GetVersionResponseDto, response);
+        return plainToInstance(VersionDto, response);
     }
 
     @ApiOperation({
@@ -147,26 +138,23 @@ export class VersionsController {
         description:
             'Updates the information about a particular version by the service id.  Uses service id to check if version is associated with a service',
     })
-    @ApiOkResponse({
-        type: APIVersionResponse,
-    })
-
-    // Function definition
+    @ApiOkResponse({ type: VersionResponseDto })
+    // Implementation details
     @Patch(':versionId')
     async updateVersion(
-        @Param() reqParams: UpdateVersionReqParamsDto,
-        @Body() reqBody: UpdateVersionReqBodyDto,
-    ): Promise<UpdateVersionResponseDto> {
+        @Param() reqParams: VersionRequestParamsDto,
+        @Body() reqBody: VersionPartialReqBodyDto,
+    ): Promise<VersionDto> {
         const versionEntity = await this.versionsService.updateVersion(
             reqParams,
             reqBody,
         );
 
-        const response: UpdateVersionResponseDto = {
+        const response: VersionDto = {
             entity: versionEntity,
         };
 
-        return plainToInstance(UpdateVersionResponseDto, response);
+        return plainToInstance(VersionDto, response);
     }
 
     @ApiOperation({
@@ -180,12 +168,11 @@ export class VersionsController {
     @ApiConflictResponse({
         type: APIConflictExceptionResponse,
     })
-
-    // Function definition
+    // Implementation details
     @Delete(':versionId')
     @HttpCode(204)
     async deleteVersion(
-        @Param() reqParams: DeleteVersionReqParamsDto,
+        @Param() reqParams: VersionRequestParamsDto,
     ): Promise<void> {
         await this.versionsService.deleteVersion(reqParams);
 

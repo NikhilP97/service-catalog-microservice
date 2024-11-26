@@ -1,3 +1,6 @@
+/**
+ * @fileoverview HTTP handles for the version entity
+ */
 import {
     Controller,
     Get,
@@ -24,24 +27,18 @@ import {
 } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 
-import {
-    ListServicesReqQueryDto,
-    ListServicesResponseDto,
-    CreateServiceReqBodyDto,
-    CreateServiceResponseDto,
-    GetServiceResponseDto,
-    UpdateServiceReqParamsDto,
-    UpdateServiceReqBodyDto,
-    UpdateServiceResponseDto,
-    DeleteServiceReqParamsDto,
-} from './dto';
 import { ServicesService } from './services.service';
 import {
-    APIServiceListResponse,
-    APIServiceResponse,
-    ServiceRequestParams,
-} from './dto/shared';
-import { isEmptyValue } from 'src/utility/validations';
+    ServiceDto,
+    ServiceListDto,
+    ServiceListRequestQuery,
+    ServiceListResponseDto,
+    ServicePartialRequestBodyDto,
+    ServiceRequestBodyDto,
+    ServiceRequestParamsDto,
+    ServiceResponseDto,
+} from './dto/services.dto';
+import { isEmptyValue } from 'src/utils';
 import { APIErrorResponse } from 'src/types/common.dto';
 import {
     APIInternalServerErrorResponse,
@@ -73,21 +70,20 @@ export class ServicesController {
             'Creates a new service entity and a corresponding version entity which serves as the default initial version',
     })
     @ApiCreatedResponse({
-        type: APIServiceResponse,
+        type: ServiceResponseDto,
     })
-
-    // Function definition
+    // Implementation details
     @Post()
     async createService(
-        @Body() reqBody: CreateServiceReqBodyDto,
-    ): Promise<CreateServiceResponseDto> {
+        @Body() reqBody: ServiceRequestBodyDto,
+    ): Promise<ServiceDto> {
         const serviceEntity = await this.servicesService.createService(reqBody);
 
-        const response: CreateServiceResponseDto = {
+        const response: ServiceDto = {
             entity: serviceEntity,
         };
 
-        return plainToInstance(CreateServiceResponseDto, response);
+        return plainToInstance(ServiceDto, response);
     }
 
     @ApiOperation({
@@ -96,27 +92,26 @@ export class ServicesController {
             'Returns information about the services and supports filtering, pagination and sorting',
     })
     @ApiOkResponse({
-        type: APIServiceListResponse,
+        type: ServiceListResponseDto,
     })
     @ApiNotFoundResponse({
         type: APINotFoundErrorResponse,
     })
-
-    // Function definition
+    // Implementation details
     @Get()
     async findServices(
-        @Query() reqQuery?: ListServicesReqQueryDto,
-    ): Promise<ListServicesResponseDto> {
+        @Query() reqQuery?: ServiceListRequestQuery,
+    ): Promise<ServiceListDto> {
         const servicesData = await this.servicesService.getServices(reqQuery);
 
-        const response: ListServicesResponseDto = {
+        const response: ServiceListDto = {
             entities: servicesData.services,
             meta: {
                 pagination: servicesData.pagination,
             },
         };
 
-        return plainToInstance(ListServicesResponseDto, response);
+        return plainToInstance(ServiceListDto, response);
     }
 
     @ApiOperation({
@@ -125,25 +120,24 @@ export class ServicesController {
             'Returns information about a particular service by the service id',
     })
     @ApiOkResponse({
-        type: APIServiceResponse,
+        type: ServiceResponseDto,
     })
     @ApiNotFoundResponse({
         type: APINotFoundErrorResponse,
     })
-
-    // Function definition
+    // Implementation details
     @Get(':serviceId')
     async getService(
-        @Param() reqParams: ServiceRequestParams,
-    ): Promise<GetServiceResponseDto> {
+        @Param() reqParams: ServiceRequestParamsDto,
+    ): Promise<ServiceDto> {
         const serviceEntity =
             await this.servicesService.getServiceById(reqParams);
 
-        const response: GetServiceResponseDto = {
+        const response: ServiceDto = {
             entity: serviceEntity,
         };
 
-        return plainToInstance(GetServiceResponseDto, response);
+        return plainToInstance(ServiceDto, response);
     }
 
     @ApiOperation({
@@ -152,18 +146,18 @@ export class ServicesController {
             'Updates the information about a particular service by the service id',
     })
     @ApiOkResponse({
-        type: APIServiceResponse,
+        type: ServiceResponseDto,
     })
     @ApiNotFoundResponse({
         type: APINotFoundErrorResponse,
     })
 
-    // Function definition
+    // Implementation details
     @Patch(':serviceId')
     async updateService(
-        @Param() reqParams: UpdateServiceReqParamsDto,
-        @Body() reqBody: UpdateServiceReqBodyDto,
-    ): Promise<UpdateServiceResponseDto> {
+        @Param() reqParams: ServiceRequestParamsDto,
+        @Body() reqBody: ServicePartialRequestBodyDto,
+    ): Promise<ServiceDto> {
         if (isEmptyValue(reqBody)) {
             throw new BadRequestException('Update data cannot be empty');
         }
@@ -173,11 +167,11 @@ export class ServicesController {
             reqBody,
         );
 
-        const response: UpdateServiceResponseDto = {
+        const response: ServiceDto = {
             entity: updatedServiceEntity,
         };
 
-        return plainToInstance(UpdateServiceResponseDto, response);
+        return plainToInstance(ServiceDto, response);
     }
 
     @ApiOperation({
@@ -192,12 +186,11 @@ export class ServicesController {
     @ApiNotFoundResponse({
         type: APINotFoundErrorResponse,
     })
-
-    // Function definition
+    // Implementation details
     @Delete(':serviceId')
     @HttpCode(204)
     async deleteService(
-        @Param() reqParams: DeleteServiceReqParamsDto,
+        @Param() reqParams: ServiceRequestParamsDto,
     ): Promise<void> {
         await this.servicesService.deleteService(reqParams);
 

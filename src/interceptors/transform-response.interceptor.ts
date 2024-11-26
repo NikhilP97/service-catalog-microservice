@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Enables serialization and transformation of the response object
+ * Strips values that are not marked as Exposed in the DTO
+ * Adds high level keys to the response like 'data' and 'status_code'
+ */
 import {
     CallHandler,
     ClassSerializerInterceptorOptions,

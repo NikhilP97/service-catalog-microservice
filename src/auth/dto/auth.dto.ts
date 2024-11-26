@@ -1,11 +1,15 @@
+/**
+ * @fileoverview Data transfer objects (DTO) for the auth entity
+ * Contains internal DTOs as well as Swagger DTOs
+ */
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { IsNotEmpty, IsUUID, IsEnum, IsArray } from 'class-validator';
 
-import { DefinedRoles } from 'src/types/auth.enum';
+import { DefinedRoles } from 'src/constants';
 import { EntityResponse } from 'src/types/common.dto';
 
-export class GenerateJwtDto {
+export class TokenRequestBodyDto {
     @ApiProperty({
         description: 'The unique ID of the user',
         example: '0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2',
@@ -26,7 +30,7 @@ export class GenerateJwtDto {
     roles: DefinedRoles[];
 }
 
-export class GenerateJwtResponse {
+export class TokenResponseDto {
     @ApiProperty({
         description: 'The JWT token containing the user id and roles',
         example:

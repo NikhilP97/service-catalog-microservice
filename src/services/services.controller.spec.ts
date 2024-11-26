@@ -2,20 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { BadRequestException } from '@nestjs/common';
 
-import { ServiceRequestParams } from './dto/shared';
-import { ServiceEntity } from './entities/service.entity';
+import {
+    ServiceDto,
+    ServiceListDto,
+    ServiceListRequestQuery,
+    ServicePartialRequestBodyDto,
+    ServiceRequestBodyDto,
+    ServiceRequestParamsDto,
+} from './dto/services.dto';
 import { ServicesController } from './services.controller';
 import { ServicesService } from './services.service';
-import {
-    ListServicesReqQueryDto,
-    ListServicesResponseDto,
-    CreateServiceReqBodyDto,
-    CreateServiceResponseDto,
-    UpdateServiceReqParamsDto,
-    UpdateServiceReqBodyDto,
-    UpdateServiceResponseDto,
-    DeleteServiceReqParamsDto,
-} from './dto';
+import { ServiceEntity } from './entities/service.entity';
 
 const mockServiceEntity: ServiceEntity = {
     id: '1',
@@ -27,7 +24,7 @@ const mockServiceEntity: ServiceEntity = {
     updated_at: new Date(),
     deleted_at: null,
 };
-const mockServicesResponse: ListServicesResponseDto = {
+const mockServicesResponse: ServiceListDto = {
     entities: [mockServiceEntity],
     meta: {
         pagination: {
@@ -38,10 +35,10 @@ const mockServicesResponse: ListServicesResponseDto = {
         },
     },
 };
-const mockCreateServiceResponse: CreateServiceResponseDto = {
+const mockCreateServiceResponse: ServiceDto = {
     entity: mockServiceEntity,
 };
-const mockUpdateServiceResponse: UpdateServiceResponseDto = {
+const mockUpdateServiceResponse: ServiceDto = {
     entity: mockServiceEntity,
 };
 
@@ -71,7 +68,7 @@ describe('ServicesController', () => {
     describe('createService', () => {
         it('Should create a service', async () => {
             // Arrange
-            const reqBody: CreateServiceReqBodyDto = {
+            const reqBody: ServiceRequestBodyDto = {
                 name: 'Test Service',
                 description: 'Mock service description',
             };
@@ -89,7 +86,7 @@ describe('ServicesController', () => {
     describe('findServices', () => {
         it('Should return a list of services', async () => {
             // Arrange
-            const reqQuery: ListServicesReqQueryDto = {
+            const reqQuery: ServiceListRequestQuery = {
                 'page[number]': 1,
                 'page[size]': 10,
             };
@@ -115,7 +112,7 @@ describe('ServicesController', () => {
     describe('getService', () => {
         it('Should return a service by ID', async () => {
             // Arrange
-            const reqParams: ServiceRequestParams = { serviceId: '1' };
+            const reqParams: ServiceRequestParamsDto = { serviceId: '1' };
             servicesService.getServiceById.mockResolvedValue(mockServiceEntity);
 
             // Act
@@ -132,8 +129,8 @@ describe('ServicesController', () => {
     describe('updateService', () => {
         it('Should update a service with valid data', async () => {
             // Arrange
-            const reqParams: UpdateServiceReqParamsDto = { serviceId: '1' };
-            const reqBody: UpdateServiceReqBodyDto = {
+            const reqParams: ServiceRequestParamsDto = { serviceId: '1' };
+            const reqBody: ServicePartialRequestBodyDto = {
                 name: 'Updated Service',
             };
             servicesService.updateService.mockResolvedValue(mockServiceEntity);
@@ -154,8 +151,8 @@ describe('ServicesController', () => {
 
         it('Should throw BadRequestException if update data is empty', async () => {
             // Arrange
-            const reqParams: UpdateServiceReqParamsDto = { serviceId: '1' };
-            const reqBody: UpdateServiceReqBodyDto = {};
+            const reqParams: ServiceRequestParamsDto = { serviceId: '1' };
+            const reqBody: ServicePartialRequestBodyDto = {};
 
             // Act & Assert
             await expect(
@@ -170,7 +167,7 @@ describe('ServicesController', () => {
     describe('deleteService', () => {
         it('Should delete a service by ID', async () => {
             // Arrange
-            const reqParams: DeleteServiceReqParamsDto = { serviceId: '1' };
+            const reqParams: ServiceRequestParamsDto = { serviceId: '1' };
             servicesService.deleteService.mockResolvedValue();
 
             // Act

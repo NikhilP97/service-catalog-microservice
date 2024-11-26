@@ -1,3 +1,6 @@
+/**
+ * @fileoverview HTTP handles for the auth entity
+ */
 import { Controller, Post, Body, Get } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import {
@@ -10,20 +13,20 @@ import {
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { Roles, Public } from 'src/decorators';
-import { DefinedRoles } from 'src/types/auth.enum';
-import { AuthService } from './auth.service';
-import {
-    AuthInformationDto,
-    GenerateJwtDto,
-    GenerateJwtResponse,
-} from './dto/generate-jwt.dto';
 import { APIErrorResponse } from 'src/types/common.dto';
+import { DefinedRoles } from 'src/constants';
+import { Roles, Public } from 'src/decorators';
 import {
     APIInternalServerErrorResponse,
     APIUnauthenticatedExceptionResponse,
     APIForbiddenExceptionResponse,
 } from 'src/types/swagger.dto';
+import { AuthService } from './auth.service';
+import {
+    AuthInformationDto,
+    TokenRequestBodyDto,
+    TokenResponseDto,
+} from './dto/auth.dto';
 
 @ApiTags('Auth')
 @ApiBearerAuth()
@@ -45,17 +48,17 @@ export class AuthController {
     })
     // Function definition
     @Public()
-    @Post('generate-jwt')
-    async generateJwt(
-        @Body() generateJwtDto: GenerateJwtDto,
-    ): Promise<GenerateJwtResponse> {
-        const jwtString = await this.authService.generateJwt(generateJwtDto);
+    @Post('generate-token')
+    async generateToken(
+        @Body() tokenRequestDto: TokenRequestBodyDto,
+    ): Promise<TokenResponseDto> {
+        const jwtString = await this.authService.generateToken(tokenRequestDto);
 
-        const response: GenerateJwtResponse = {
+        const response: TokenResponseDto = {
             access_token: jwtString,
         };
 
-        return plainToInstance(GenerateJwtResponse, response);
+        return plainToInstance(TokenResponseDto, response);
     }
 
     @ApiOperation({

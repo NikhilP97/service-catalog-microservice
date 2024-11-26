@@ -7,13 +7,11 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ServicesService } from './services.service';
 import { ServiceEntity } from './entities/service.entity';
 import {
-    CreateServiceReqBodyDto,
-    DeleteServiceReqParamsDto,
-    GetServiceReqParamsDto,
-    ListServicesReqQueryDto,
-    UpdateServiceReqBodyDto,
-    UpdateServiceReqParamsDto,
-} from './dto';
+    ServiceListRequestQuery,
+    ServicePartialRequestBodyDto,
+    ServiceRequestBodyDto,
+    ServiceRequestParamsDto,
+} from './dto/services.dto';
 
 const mockService: ServiceEntity = {
     id: 'mock-service-id',
@@ -55,7 +53,7 @@ describe('ServicesService', () => {
     describe('createService', () => {
         it('should validate and create a new service', async () => {
             // Arrange
-            const createDto: CreateServiceReqBodyDto = {
+            const createDto: ServiceRequestBodyDto = {
                 name: 'Test Service',
                 description: 'A test service',
             };
@@ -84,7 +82,7 @@ describe('ServicesService', () => {
     describe('getServiceById', () => {
         it('should return service if found', async () => {
             // Arrange
-            const getParams: GetServiceReqParamsDto = {
+            const getParams: ServiceRequestParamsDto = {
                 serviceId: 'mock-service-id',
             };
             serviceRepository.createQueryBuilder.mockReturnValue({
@@ -106,7 +104,7 @@ describe('ServicesService', () => {
 
         it('should throw NotFoundException if service is not found', async () => {
             // Arrange
-            const getParams: GetServiceReqParamsDto = {
+            const getParams: ServiceRequestParamsDto = {
                 serviceId: 'non-existing-id',
             };
             serviceRepository.createQueryBuilder.mockReturnValue({
@@ -129,7 +127,7 @@ describe('ServicesService', () => {
     describe('getServices', () => {
         it('should return paginated services', async () => {
             // Arrange
-            const queryParams: ListServicesReqQueryDto = {
+            const queryParams: ServiceListRequestQuery = {
                 'page[number]': 1,
                 'page[size]': 10,
             };
@@ -157,7 +155,7 @@ describe('ServicesService', () => {
 
         it('should return services filtered by searchTerm', async () => {
             // Arrange
-            const queryParams: ListServicesReqQueryDto = {
+            const queryParams: ServiceListRequestQuery = {
                 'page[number]': 1,
                 'page[size]': 10,
                 searchTerm: 'Mock Service',
@@ -186,7 +184,7 @@ describe('ServicesService', () => {
 
         it('should throw not found exception if no services were found', async () => {
             // Arrange
-            const queryParams: ListServicesReqQueryDto = {
+            const queryParams: ServiceListRequestQuery = {
                 'page[number]': 1,
                 'page[size]': 10,
             };
@@ -214,10 +212,10 @@ describe('ServicesService', () => {
     describe('updateService', () => {
         it('should update an existing service', async () => {
             // Arrange
-            const updateParams: UpdateServiceReqParamsDto = {
+            const updateParams: ServiceRequestParamsDto = {
                 serviceId: 'mock-service-id',
             };
-            const updateData: UpdateServiceReqBodyDto = {
+            const updateData: ServicePartialRequestBodyDto = {
                 name: 'Updated Service',
             };
             mockService.name = updateData.name!;
@@ -249,10 +247,10 @@ describe('ServicesService', () => {
 
         it('should throw BadRequestException if the update data is empty', async () => {
             // Arrange
-            const updateParams: UpdateServiceReqParamsDto = {
+            const updateParams: ServiceRequestParamsDto = {
                 serviceId: 'mock-service-id',
             };
-            const updateData: UpdateServiceReqBodyDto = {};
+            const updateData: ServicePartialRequestBodyDto = {};
 
             // Act & Assert
             await expect(
@@ -264,10 +262,10 @@ describe('ServicesService', () => {
 
         it('should throw NotFoundException if service does not exist', async () => {
             // Arrange
-            const updateParams: UpdateServiceReqParamsDto = {
+            const updateParams: ServiceRequestParamsDto = {
                 serviceId: 'non-existing-id',
             };
-            const updateData: UpdateServiceReqBodyDto = {
+            const updateData: ServicePartialRequestBodyDto = {
                 name: 'Updated Service',
             };
             serviceRepository.findOne.mockResolvedValue(null);
@@ -282,7 +280,7 @@ describe('ServicesService', () => {
     describe('deleteService', () => {
         it('should soft delete an existing service', async () => {
             // Arrange
-            const deleteParams: DeleteServiceReqParamsDto = {
+            const deleteParams: ServiceRequestParamsDto = {
                 serviceId: 'mock-service-id',
             };
             serviceRepository.findOne.mockResolvedValue(mockService);
@@ -298,7 +296,7 @@ describe('ServicesService', () => {
 
         it('should throw NotFoundException if service does not exist', async () => {
             // Arrange
-            const deleteParams: DeleteServiceReqParamsDto = {
+            const deleteParams: ServiceRequestParamsDto = {
                 serviceId: 'non-existing-id',
             };
             serviceRepository.findOne.mockResolvedValue(null);

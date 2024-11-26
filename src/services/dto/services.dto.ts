@@ -1,4 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
+/**
+ * @fileoverview Data transfer objects (DTO) for the services entity
+ * Contains internal DTOs as well as Swagger DTOs
+ */
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import {
     IsEnum,
@@ -12,15 +16,23 @@ import {
     APISuccessResponse,
     EntityResponse,
     ListEntitiesResponse,
+    Page,
     PaginationSearchSort,
 } from 'src/types/common.dto';
+import { ServiceEntity } from '../entities/service.entity';
 
 enum SortByValues {
     name = 'name',
     created_at = 'created_at',
 }
 
-export class PagSearchSortForService extends PaginationSearchSort {
+export class ServiceEntitiesWithPagination {
+    services: ServiceEntity[];
+
+    pagination: Page;
+}
+
+export class ServiceListRequestQuery extends PaginationSearchSort {
     @ApiProperty({
         description: 'The field by which the data should be sorted',
         enum: SortByValues,
@@ -34,7 +46,7 @@ export class PagSearchSortForService extends PaginationSearchSort {
     readonly sortBy?: SortByValues = SortByValues.created_at;
 }
 
-export class ServiceRequestParams {
+export class ServiceRequestParamsDto {
     @ApiProperty({
         description: 'The unique ID for the entity',
         example: '0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2',
@@ -44,7 +56,7 @@ export class ServiceRequestParams {
     readonly serviceId: string;
 }
 
-export class ServiceRequestBody {
+export class ServiceRequestBodyDto {
     @ApiProperty({
         description: 'The name of entity',
         example: 'New Service Name',
@@ -62,7 +74,11 @@ export class ServiceRequestBody {
     readonly description: string;
 }
 
-export class ServiceResponse {
+export class ServicePartialRequestBodyDto extends PartialType(
+    ServiceRequestBodyDto,
+) {}
+
+export class ServiceExposedProperties {
     @ApiProperty({
         description: 'The name of entity',
         example: 'New Service Name',
@@ -92,44 +108,44 @@ export class ServiceResponse {
     readonly no_of_versions: number;
 }
 
-export class ServiceResponseDto extends EntityResponse<ServiceResponse> {
+export class ServiceDto extends EntityResponse<ServiceExposedProperties> {
     constructor() {
-        super(ServiceResponse);
+        super(ServiceExposedProperties);
     }
 
     @ApiProperty({
         description: 'The information about the service entity',
-        type: ServiceResponse,
+        type: ServiceExposedProperties,
     })
-    entity: ServiceResponse;
+    entity: ServiceExposedProperties;
 }
 
-export class APIServiceResponse extends APISuccessResponse<ServiceResponseDto> {
+export class ServiceResponseDto extends APISuccessResponse<ServiceDto> {
     @ApiProperty({
         description:
             'The base level data key that contains information about the API',
-        type: ServiceResponseDto,
+        type: ServiceDto,
     })
-    data: ServiceResponseDto;
+    data: ServiceDto;
 }
 
-export class ServiceResponseListDto extends ListEntitiesResponse<ServiceResponse> {
+export class ServiceListDto extends ListEntitiesResponse<ServiceExposedProperties> {
     constructor() {
-        super(ServiceResponse);
+        super(ServiceExposedProperties);
     }
 
     @ApiProperty({
         description: 'The list of information about the service entities',
-        type: [ServiceResponse],
+        type: [ServiceExposedProperties],
     })
-    entities: ServiceResponse[];
+    entities: ServiceExposedProperties[];
 }
 
-export class APIServiceListResponse extends APISuccessResponse<ServiceResponseListDto> {
+export class ServiceListResponseDto extends APISuccessResponse<ServiceListDto> {
     @ApiProperty({
         description:
             'The base level data key that contains information about the API',
-        type: [ServiceResponseListDto],
+        type: [ServiceListDto],
     })
-    data: ServiceResponseListDto;
+    data: ServiceListDto;
 }

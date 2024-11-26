@@ -1,15 +1,19 @@
-import { ApiProperty } from '@nestjs/swagger';
+/**
+ * @fileoverview Data transfer objects (DTO) for the versions entity
+ * Contains internal DTOs as well as Swagger DTOs
+ */
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { IsNotEmpty, IsString } from 'class-validator';
 
-import { ServiceRequestParams } from 'src/services/dto/shared';
+import { ServiceRequestParamsDto } from 'src/services/dto/services.dto';
 import {
     APISuccessResponse,
     EntityResponse,
     ListEntitiesResponse,
 } from 'src/types/common.dto';
 
-export class VersionRequestParams extends ServiceRequestParams {
+export class VersionRequestParamsDto extends ServiceRequestParamsDto {
     @ApiProperty({
         description: 'The unique ID for the entity',
         example: '0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2',
@@ -19,7 +23,7 @@ export class VersionRequestParams extends ServiceRequestParams {
     readonly versionId: string;
 }
 
-export class VersionRequestBody {
+export class VersionRequestBodyDto {
     @ApiProperty({
         description: 'The name of entity',
         example: 'New Version Name',
@@ -37,7 +41,11 @@ export class VersionRequestBody {
     readonly overview: string;
 }
 
-export class VersionResponse {
+export class VersionPartialReqBodyDto extends PartialType(
+    VersionRequestBodyDto,
+) {}
+
+export class VersionExposedProperties {
     @ApiProperty({
         description: 'The unique ID for the entity',
         example: '0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2',
@@ -60,44 +68,44 @@ export class VersionResponse {
     readonly overview: string;
 }
 
-export class VersionResponseDto extends EntityResponse<VersionResponse> {
+export class VersionDto extends EntityResponse<VersionExposedProperties> {
     constructor() {
-        super(VersionResponse);
+        super(VersionExposedProperties);
     }
 
     @ApiProperty({
         description: 'The information about the version entity',
-        type: VersionResponse,
+        type: VersionExposedProperties,
     })
-    entity: VersionResponse;
+    entity: VersionExposedProperties;
 }
 
-export class APIVersionResponse extends APISuccessResponse<VersionResponse> {
+export class VersionResponseDto extends APISuccessResponse<VersionDto> {
     @ApiProperty({
         description:
             'The base level data key that contains information about the API',
-        type: VersionResponseDto,
+        type: VersionDto,
     })
-    data: VersionResponse;
+    data: VersionDto;
 }
 
-export class VersionResponseListDto extends ListEntitiesResponse<VersionResponse> {
+export class VersionListDto extends ListEntitiesResponse<VersionExposedProperties> {
     constructor() {
-        super(VersionResponse);
+        super(VersionExposedProperties);
     }
 
     @ApiProperty({
         description: 'The list of information about the version entities',
-        type: [VersionResponse],
+        type: [VersionExposedProperties],
     })
-    entities: VersionResponse[];
+    entities: VersionExposedProperties[];
 }
 
-export class APIVersionListResponse extends APISuccessResponse<VersionResponseListDto> {
+export class VersionListResponseDto extends APISuccessResponse<VersionListDto> {
     @ApiProperty({
         description:
             'The base level data key that contains information about the API',
-        type: [VersionResponseListDto],
+        type: [VersionListDto],
     })
-    data: VersionResponseListDto;
+    data: VersionListDto;
 }

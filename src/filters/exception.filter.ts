@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Defines the last exception layer for the application
+ * Handles HTTP exceptions as well as non-http exceptions
+ * Transforms the error object to the required DTO
+ * Logs the error in case the error is an Internal Server Error
+ */
 import {
     ExceptionFilter,
     Catch,
@@ -11,7 +17,7 @@ import { HttpAdapterHost } from '@nestjs/core';
 import { isString } from 'class-validator';
 
 import { APIErrorResponse } from 'src/types/common.dto';
-import { isEmptyValue } from 'src/utility/validations';
+import { isEmptyValue } from 'src/utils';
 
 @Catch()
 export class CatchEveryErrorFilter implements ExceptionFilter {
