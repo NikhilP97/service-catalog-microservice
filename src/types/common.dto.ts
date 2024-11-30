@@ -1,7 +1,7 @@
 /**
  * @fileoverview Common DTOs used by different services and controllers
  */
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import {
     IsEnum,
@@ -54,34 +54,33 @@ export class MetaData {
     readonly pagination: Page;
 }
 
-export class PaginationSearchSort {
-    @ApiProperty({
-        description:
-            'The page number to start searching from. Minimum value should be 1',
-        default: 1,
-        example: 1,
-    })
+class PageQuery {
     @IsOptional()
     @IsNotEmpty()
     @IsNumber()
     @Min(1, { message: 'page number must be at least 1' })
-    readonly 'page[number]'?: number = 1;
+    @Type(() => Number)
+    readonly number?: number = 1;
 
-    @ApiProperty({
-        description: 'The amount of items that the API should fetch',
-        default: 20,
-        example: 20,
-    })
     @IsOptional()
     @IsNotEmpty()
     @IsNumber()
-    readonly 'page[size]'?: number = 20;
+    @Min(1, { message: 'page size must be at least 1' })
+    @Type(() => Number)
+    readonly size?: number = 20;
+}
+
+export class PaginationSearchSort {
+    @ApiHideProperty()
+    @Type(() => PageQuery)
+    @ValidateNested()
+    readonly page: PageQuery;
 
     @ApiProperty({
         description:
             'The search string to filter and search items. For this service, the API searches on the name and description fields',
         default: '',
-        example: 'Location Service',
+        example: '',
     })
     @IsOptional()
     @IsNotEmpty()

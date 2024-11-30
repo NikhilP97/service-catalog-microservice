@@ -78,11 +78,10 @@ export class ServicesService {
         }
 
         const {
-            'page[number]': pageNumber = 1,
-            'page[size]': pageSize = 20,
             searchTerm,
             order = 'DESC',
             sortBy = 'created_at',
+            page: { number: pageNumber = 1, size: pageSize = 20 },
         } = requestParams!;
         const queryBuilder = this.serviceRepository
             .createQueryBuilder('service')
@@ -105,7 +104,7 @@ export class ServicesService {
         queryBuilder.orderBy(`service.${sortBy}`, order, 'NULLS LAST');
 
         // Implement pagination
-        queryBuilder.skip((pageNumber - 1) * pageSize).take(pageSize);
+        queryBuilder.offset((pageNumber - 1) * pageSize).limit(pageSize);
 
         const [services, totalItems] = await Promise.all([
             queryBuilder.getRawMany(),

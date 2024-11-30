@@ -384,16 +384,19 @@ Currently one flow has been implemented to demonstrate the implementation of E2E
    ```bash
    git clone https://github.com/NikhilP97/service-catalog-microservice.git
    ```
-
-2. Install dependencies:
+2. Copy environment file
+   ```bash
+   cp .env.example .env
+   ```
+3. Install dependencies:
    ```bash
    npm install
    ```
-3. Start the database with Docker Compose:
+4. Start the database with Docker Compose:
    ```bash
    docker-compose up -d database_service
    ```
-4. Run the application:
+5. Run the application:
    ```bash
    npm run start:dev
    ```

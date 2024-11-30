@@ -22,6 +22,7 @@ import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
+    ApiQuery,
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -96,6 +97,22 @@ export class ServicesController {
     })
     @ApiNotFoundResponse({
         type: APINotFoundErrorResponse,
+    })
+    @ApiQuery({
+        name: 'page[size]',
+        description: 'The number of items per page for pagination',
+        required: false,
+        example: 20,
+        default: 20,
+        type: Number,
+    })
+    @ApiQuery({
+        name: 'page[number]',
+        description: 'The page number for pagination',
+        required: false,
+        example: 1,
+        default: 1,
+        type: Number,
     })
     // Implementation details
     @Get()
