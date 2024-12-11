@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  test_database_service:
+    container_name: test_postgres_db_for_service_catalog
+    image: postgres:15
+    environment:
+      POSTGRES_USER: test_postgres_user
+      POSTGRES_PASSWORD: test_postgres_password
+      POSTGRES_DB: test_service_catalog_pgdb
+    ports:
+      - '5440:5432'
+    volumes:
+      - test_pg_data:/var/lib/postgresql/data
+
+volumes:
+  test_pg_data: {}

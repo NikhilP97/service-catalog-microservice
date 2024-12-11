@@ -1,0 +1,1231 @@
+openapi: 3.0.0
+paths:
+  /api/v1/services:
+    post:
+      description: >-
+        Creates a new service entity and a corresponding version entity which
+        serves as the default initial version
+      operationId: ServicesController_createService_v1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceRequestBodyDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceResponseDto'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Creates a new service
+      tags:
+        - Services
+    get:
+      description: >-
+        Returns information about the services and supports filtering,
+        pagination and sorting
+      operationId: ServicesController_findServices_v1
+      parameters:
+        - name: searchTerm
+          required: false
+          in: query
+          description: >-
+            The search string to filter and search items. For this service, the
+            API searches on the name and description fields
+          schema:
+            default: ''
+            example: ''
+            type: string
+        - name: order
+          required: false
+          in: query
+          description: The order by which the results should be sorted
+          schema:
+            default: DESC
+            example: DESC
+            enum:
+              - ASC
+              - DESC
+            type: string
+        - name: sortBy
+          required: false
+          in: query
+          description: The field by which the data should be sorted
+          schema:
+            default: created_at
+            example: created_at
+            enum:
+              - name
+              - created_at
+            type: string
+        - name: page[number]
+          required: false
+          in: query
+          description: The page number for pagination
+          schema:
+            default: 1
+            example: 1
+            type: number
+        - name: page[size]
+          required: false
+          in: query
+          description: The number of items per page for pagination
+          schema:
+            default: 20
+            example: 20
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceListResponseDto'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APINotFoundErrorResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Fetches a list of information about services
+      tags:
+        - Services
+  /api/v1/services/{serviceId}:
+    get:
+      description: Returns information about a particular service by the service id
+      operationId: ServicesController_getService_v1
+      parameters:
+        - name: serviceId
+          required: true
+          in: path
+          description: The unique ID for the entity
+          schema:
+            example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParticularServiceResponseDto'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APINotFoundErrorResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Get the information about a particular service
+      tags:
+        - Services
+    patch:
+      description: Updates the information about a particular service by the service id
+      operationId: ServicesController_updateService_v1
+      parameters:
+        - name: serviceId
+          required: true
+          in: path
+          description: The unique ID for the entity
+          schema:
+            example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServicePartialRequestBodyDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceResponseDto'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APINotFoundErrorResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Update the information about a particular service
+      tags:
+        - Services
+    delete:
+      description: >-
+        When a particular service is deleted, all versions related to that
+        service will also be deleted
+      operationId: ServicesController_deleteService_v1
+      parameters:
+        - name: serviceId
+          required: true
+          in: path
+          description: The unique ID for the entity
+          schema:
+            example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+            type: string
+      responses:
+        '204':
+          description: Service deleted successfully
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APINotFoundErrorResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Deletes the information about a particular service and related versions
+      tags:
+        - Services
+  /api/v1/services/{serviceId}/versions:
+    post:
+      description: Creates a new version for a particular service
+      operationId: VersionsController_createVersion_v1
+      parameters:
+        - name: serviceId
+          required: true
+          in: path
+          description: The unique ID for the entity
+          schema:
+            example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionRequestBodyDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionResponseDto'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APINotFoundErrorResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Creates a new version for a particular service
+      tags:
+        - Services
+    get:
+      description: >-
+        Returns information about the services. Currently does not support
+        filtering, pagination and sorting
+      operationId: VersionsController_findAllVersions_v1
+      parameters:
+        - name: serviceId
+          required: true
+          in: path
+          description: The unique ID for the entity
+          schema:
+            example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionListResponseDto'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APINotFoundErrorResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: >-
+        Fetches a list of information about all the versions related to a
+        particular service
+      tags:
+        - Services
+  /api/v1/services/{serviceId}/versions/{versionId}:
+    get:
+      description: >-
+        Returns information about a particular version by the version id. Uses
+        service id to check if version is associated with a service
+      operationId: VersionsController_findOneVersion_v1
+      parameters:
+        - name: serviceId
+          required: true
+          in: path
+          description: The unique ID for the entity
+          schema:
+            example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+            type: string
+        - name: versionId
+          required: true
+          in: path
+          description: The unique ID for the entity
+          schema:
+            example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionResponseDto'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APINotFoundErrorResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Get the information about a particular version
+      tags:
+        - Services
+    patch:
+      description: >-
+        Updates the information about a particular version by the service id. 
+        Uses service id to check if version is associated with a service
+      operationId: VersionsController_updateVersion_v1
+      parameters:
+        - name: serviceId
+          required: true
+          in: path
+          description: The unique ID for the entity
+          schema:
+            example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+            type: string
+        - name: versionId
+          required: true
+          in: path
+          description: The unique ID for the entity
+          schema:
+            example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionPartialReqBodyDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionResponseDto'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APINotFoundErrorResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Update the information about a particular version
+      tags:
+        - Services
+    delete:
+      description: >-
+        It will not delete if the version you are trying to delete is the only
+        version associated with the service
+      operationId: VersionsController_deleteVersion_v1
+      parameters:
+        - name: serviceId
+          required: true
+          in: path
+          description: The unique ID for the entity
+          schema:
+            example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+            type: string
+        - name: versionId
+          required: true
+          in: path
+          description: The unique ID for the entity
+          schema:
+            example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+            type: string
+      responses:
+        '204':
+          description: Version deleted successfully
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APINotFoundErrorResponse'
+        '409':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIConflictExceptionResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Deletes the information about a particular version
+      tags:
+        - Services
+  /api/v1/auth/generate-token:
+    post:
+      operationId: AuthController_generateToken_v1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRequestBodyDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponseDto'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Generates a JWT token given a user id and an array of roles
+      tags:
+        - Auth
+  /api/v1/auth/public-endpoint:
+    get:
+      description: >-
+        Demonstrates that this endpoint can be accessed even when authentication
+        and authorization is enabled
+      operationId: AuthController_publicEndpoint_v1
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthInformationDto'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Endpoint that can be accessed even when auth is turned on
+      tags:
+        - Auth
+  /api/v1/auth/admin-endpoint:
+    get:
+      description: >-
+        If actor has other roles as well, access is still granted since user
+        roles are a superset of the required roles
+      operationId: AuthController_adminEndpoint_v1
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthInformationDto'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIForbiddenExceptionResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Endpoint that can be accessed only with admin role
+      tags:
+        - Auth
+  /api/v1/auth/user-endpoint:
+    get:
+      description: >-
+        If actor has other roles as well, access is still granted since user
+        roles are a superset of the required roles
+      operationId: AuthController_userEndpoint_v1
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthInformationDto'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIForbiddenExceptionResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Endpoint that can be accessed only with user role
+      tags:
+        - Auth
+  /api/v1/auth/user-admin-endpoint:
+    get:
+      description: To access this endpoint, actor must have both the user and admin roles
+      operationId: AuthController_userAndAdminEndpoint_v1
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthInformationDto'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIUnauthenticatedExceptionResponse'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIForbiddenExceptionResponse'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIInternalServerErrorResponse'
+      security:
+        - bearer: []
+      summary: Endpoint that can be accessed only with admin as well as user role
+      tags:
+        - Auth
+info:
+  title: Service Catalog
+  description: Details of the service catalog API definitions and schemas
+  version: 1.0.0
+  contact: {}
+tags:
+  - name: Services
+    description: >-
+      Handles CRUD operations for the Services Entity and CRUD operations for
+      Versions that are related to a particular service entity 
+  - name: Auth
+    description: >-
+      Handles JWT token generation and exposes endpoints to test authentication
+      and RBAC authorization
+servers: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      in: header
+  schemas:
+    APIErrorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          description: http status code
+          example: 400
+        title:
+          type: string
+          description: Human readable message of the error
+          example: Error in input fields
+        type:
+          type: string
+          description: Type of the http exception
+          example: BadRequestException
+        details:
+          description: Details about the error
+          example: '["username must be contain only letter and numbers"]'
+          type: array
+          items:
+            type: string
+      required:
+        - statusCode
+        - title
+        - type
+    APIUnauthenticatedExceptionResponse:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          description: http status code
+          example: 401
+        title:
+          type: string
+          description: Human readable message of the error
+          example: You are not authenticated. Please sign in and try again.
+        type:
+          type: string
+          description: Type of the http exception
+          example: UnauthorizedException
+        details:
+          description: Details about the error
+          example: '["JWT token has expired"]'
+          type: array
+          items:
+            type: string
+      required:
+        - statusCode
+        - title
+        - type
+    APIInternalServerErrorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          description: http status code
+          example: 500
+        title:
+          type: string
+          description: Human readable message of the error
+          example: An unexpected error occurred. Please try again later.
+        type:
+          type: string
+          description: Type of the http exception
+          example: InternalServerErrorException
+        details:
+          description: Details about the error
+          example: '["could not access property name of undefined"]'
+          type: array
+          items:
+            type: string
+      required:
+        - statusCode
+        - title
+        - type
+    ServiceRequestBodyDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of entity
+          example: New Service Name
+        description:
+          type: string
+          description: The description of entity
+          example: Description of the service
+      required:
+        - name
+        - description
+    ServiceExposedProperties:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of entity
+          example: New Service Name
+        description:
+          type: string
+          description: The description of entity
+          example: Description of the service
+        id:
+          type: string
+          description: The unique ID for the entity
+          example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+        no_of_versions:
+          type: number
+          description: The no of versions the entity has
+          example: 1
+      required:
+        - name
+        - description
+        - id
+        - no_of_versions
+    ServiceDto:
+      type: object
+      properties:
+        entity:
+          description: The information about the service entity
+          allOf:
+            - $ref: '#/components/schemas/ServiceExposedProperties'
+      required:
+        - entity
+    ServiceResponseDto:
+      type: object
+      properties:
+        status_code:
+          type: number
+          description: http status code
+        data:
+          description: The base level data key that contains information about the API
+          allOf:
+            - $ref: '#/components/schemas/ServiceDto'
+      required:
+        - status_code
+        - data
+    Page:
+      type: object
+      properties:
+        cur_page:
+          type: number
+          description: The current page of the requested for the entity
+        page_size:
+          type: number
+          description: The number of items returned in API response
+        total_pages:
+          type: number
+          description: The total pages for the particular entity
+        total_items:
+          type: number
+          description: The total items present in the DB for the particular entity
+      required:
+        - cur_page
+        - page_size
+        - total_pages
+        - total_items
+    MetaData:
+      type: object
+      properties:
+        pagination:
+          description: The meta information returned by the API response
+          allOf:
+            - $ref: '#/components/schemas/Page'
+      required:
+        - pagination
+    ServiceListDto:
+      type: object
+      properties:
+        entities:
+          description: The list of information about the service entities
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceExposedProperties'
+        meta:
+          $ref: '#/components/schemas/MetaData'
+      required:
+        - entities
+    ServiceListResponseDto:
+      type: object
+      properties:
+        status_code:
+          type: number
+          description: http status code
+        data:
+          description: The base level data key that contains information about the API
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceListDto'
+      required:
+        - status_code
+        - data
+    APINotFoundErrorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          description: http status code
+          example: 404
+        title:
+          type: string
+          description: Human readable message of the error
+          example: No services found
+        type:
+          type: string
+          description: Type of the http exception
+          example: NotFoundException
+        details:
+          description: Details about the error
+          example: '["Could not find any results for the given resource"]'
+          type: array
+          items:
+            type: string
+      required:
+        - statusCode
+        - title
+        - type
+    VersionExposedProperties:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ID for the entity
+          example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+        name:
+          type: string
+          description: The name of entity
+          example: New Version Name
+        overview:
+          type: string
+          description: A brief overview about the version
+          example: Summary of the version
+      required:
+        - id
+        - name
+        - overview
+    ParticularServiceExposedProperties:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of entity
+          example: New Service Name
+        description:
+          type: string
+          description: The description of entity
+          example: Description of the service
+        id:
+          type: string
+          description: The unique ID for the entity
+          example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+        no_of_versions:
+          type: number
+          description: The no of versions the entity has
+          example: 1
+        versions:
+          description: The information about the version entities
+          type: array
+          items:
+            $ref: '#/components/schemas/VersionExposedProperties'
+      required:
+        - name
+        - description
+        - id
+        - no_of_versions
+        - versions
+    ParticularServiceDto:
+      type: object
+      properties:
+        entity:
+          description: The information about the service entity
+          allOf:
+            - $ref: '#/components/schemas/ParticularServiceExposedProperties'
+      required:
+        - entity
+    ParticularServiceResponseDto:
+      type: object
+      properties:
+        status_code:
+          type: number
+          description: http status code
+        data:
+          description: The base level data key that contains information about the API
+          allOf:
+            - $ref: '#/components/schemas/ParticularServiceDto'
+      required:
+        - status_code
+        - data
+    ServicePartialRequestBodyDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of entity
+          example: New Service Name
+        description:
+          type: string
+          description: The description of entity
+          example: Description of the service
+    VersionRequestBodyDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of entity
+          example: New Version Name
+        overview:
+          type: string
+          description: A brief overview about the version
+          example: Summary of the version
+      required:
+        - name
+        - overview
+    VersionDto:
+      type: object
+      properties:
+        entity:
+          description: The information about the version entity
+          allOf:
+            - $ref: '#/components/schemas/VersionExposedProperties'
+      required:
+        - entity
+    VersionResponseDto:
+      type: object
+      properties:
+        status_code:
+          type: number
+          description: http status code
+        data:
+          description: The base level data key that contains information about the API
+          allOf:
+            - $ref: '#/components/schemas/VersionDto'
+      required:
+        - status_code
+        - data
+    VersionListDto:
+      type: object
+      properties:
+        entities:
+          description: The list of information about the version entities
+          type: array
+          items:
+            $ref: '#/components/schemas/VersionExposedProperties'
+        meta:
+          $ref: '#/components/schemas/MetaData'
+      required:
+        - entities
+    VersionListResponseDto:
+      type: object
+      properties:
+        status_code:
+          type: number
+          description: http status code
+        data:
+          description: The base level data key that contains information about the API
+          type: array
+          items:
+            $ref: '#/components/schemas/VersionListDto'
+      required:
+        - status_code
+        - data
+    VersionPartialReqBodyDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of entity
+          example: New Version Name
+        overview:
+          type: string
+          description: A brief overview about the version
+          example: Summary of the version
+    APIConflictExceptionResponse:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          description: http status code
+          example: 409
+        title:
+          type: string
+          description: Human readable message of the error
+          example: Cannot execute the given action
+        type:
+          type: string
+          description: Type of the http exception
+          example: ConflictException
+        details:
+          description: Details about the error
+          example: '["Cannot delete the only version associated with the service "]'
+          type: array
+          items:
+            type: string
+      required:
+        - statusCode
+        - title
+        - type
+    TokenRequestBodyDto:
+      type: object
+      properties:
+        user_id:
+          type: string
+          description: The unique ID of the user
+          example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+        roles:
+          type: array
+          items:
+            type: string
+            enum:
+              - user
+              - admin
+          description: The roles to be encoded in the JWT token
+          example:
+            - admin
+            - user
+      required:
+        - user_id
+        - roles
+    TokenResponseDto:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: The JWT token containing the user id and roles
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMTNkZjI1Mi1jMTEwLTQ5ZGMtYmVjMC05YjkwOTU5MmUzNWYiLCJyb2xlcyI6WyJhZG1pbiJdLCJpYXQiOjE3MzI1MDQ4NzIsImV4cCI6MTczMjUxNTY3Mn0.rKnu83lfn-4bPlNDTj7H1FDbtRbfMcsdkNWLhM8-Q_4
+      required:
+        - access_token
+    AuthInformation:
+      type: object
+      properties:
+        message:
+          type: string
+          description: message indicating what the endpoint does
+          example: >-
+            This is an admin endpoint and requires the user to have an admin
+            role
+      required:
+        - message
+    AuthInformationDto:
+      type: object
+      properties:
+        entity:
+          description: The information about the token entity
+          allOf:
+            - $ref: '#/components/schemas/AuthInformation'
+      required:
+        - entity
+    APIForbiddenExceptionResponse:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          description: http status code
+          example: 403
+        title:
+          type: string
+          description: Human readable message of the error
+          example: You do not have sufficient permissions to carry out this action
+        type:
+          type: string
+          description: Type of the http exception
+          example: ForbiddenException
+        details:
+          description: Details about the error
+          example: '["User does not have the required roles to perform this action"]'
+          type: array
+          items:
+            type: string
+      required:
+        - statusCode
+        - title
+        - type
