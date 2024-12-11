@@ -6,11 +6,11 @@ import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { IsNotEmpty, IsString } from 'class-validator';
 
-import { ServiceRequestParamsDto } from 'src/services/dto/services.dto';
 import {
     APISuccessResponse,
     EntityResponse,
     ListEntitiesResponse,
+    ServiceRequestParamsDto,
 } from 'src/types/common.dto';
 
 export class VersionRequestParamsDto extends ServiceRequestParamsDto {

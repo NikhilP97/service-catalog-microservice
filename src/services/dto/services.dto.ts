@@ -3,13 +3,13 @@
  * Contains internal DTOs as well as Swagger DTOs
  */
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
     IsEnum,
     IsNotEmpty,
     IsOptional,
     IsString,
-    IsUUID,
+    ValidateNested,
 } from 'class-validator';
 
 import {
@@ -19,6 +19,7 @@ import {
     Page,
     PaginationSearchSort,
 } from 'src/types/common.dto';
+import { VersionExposedProperties } from 'src/versions/dto/versions.dto';
 import { ServiceEntity } from '../entities/service.entity';
 
 enum SortByValues {
@@ -44,16 +45,6 @@ export class ServiceListRequestQuery extends PaginationSearchSort {
     @IsNotEmpty()
     @IsEnum(SortByValues)
     readonly sortBy?: SortByValues = SortByValues.created_at;
-}
-
-export class ServiceRequestParamsDto {
-    @ApiProperty({
-        description: 'The unique ID for the entity',
-        example: '0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2',
-    })
-    @IsNotEmpty()
-    @IsUUID()
-    readonly serviceId: string;
 }
 
 export class ServiceRequestBodyDto {
@@ -102,10 +93,33 @@ export class ServiceExposedProperties {
 
     @ApiProperty({
         description: 'The no of versions the entity has',
-        example: 3,
+        example: 1,
     })
     @Expose()
     readonly no_of_versions: number;
+}
+
+export class ParticularServiceExposedProperties extends ServiceExposedProperties {
+    @ApiProperty({
+        description: 'The information about the version entities',
+        type: [VersionExposedProperties],
+    })
+    @Expose()
+    @ValidateNested()
+    @Type(() => VersionExposedProperties)
+    readonly versions: VersionExposedProperties[];
+}
+
+export class ParticularServiceDto extends EntityResponse<ParticularServiceExposedProperties> {
+    constructor() {
+        super(ParticularServiceExposedProperties);
+    }
+
+    @ApiProperty({
+        description: 'The information about the service entity',
+        type: ParticularServiceExposedProperties,
+    })
+    entity: ParticularServiceExposedProperties;
 }
 
 export class ServiceDto extends EntityResponse<ServiceExposedProperties> {
@@ -118,6 +132,15 @@ export class ServiceDto extends EntityResponse<ServiceExposedProperties> {
         type: ServiceExposedProperties,
     })
     entity: ServiceExposedProperties;
+}
+
+export class ParticularServiceResponseDto extends APISuccessResponse<ParticularServiceDto> {
+    @ApiProperty({
+        description:
+            'The base level data key that contains information about the API',
+        type: ParticularServiceDto,
+    })
+    data: ParticularServiceDto;
 }
 
 export class ServiceResponseDto extends APISuccessResponse<ServiceDto> {

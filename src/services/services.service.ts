@@ -11,13 +11,13 @@ import { validateOrReject } from 'class-validator';
 import { IsNull, Repository } from 'typeorm';
 
 import { isEmptyValue } from 'src/utils';
+import { ServiceRequestParamsDto } from 'src/types/common.dto';
 import { ServiceEntity } from './entities/service.entity';
 import {
     ServiceEntitiesWithPagination,
     ServiceListRequestQuery,
     ServicePartialRequestBodyDto,
     ServiceRequestBodyDto,
-    ServiceRequestParamsDto,
 } from './dto/services.dto';
 
 @Injectable()
@@ -54,19 +54,15 @@ export class ServicesService {
         const { serviceId } = requestParams;
         const service = await this.serviceRepository
             .createQueryBuilder('service')
-            .leftJoin('service.versions', 'version')
-            .select('service.*')
-            .addSelect('COUNT(version.id)::int', 'no_of_versions')
+            .leftJoinAndSelect('service.versions', 'version')
             .where('service.id = :serviceId', { serviceId })
-            .andWhere('service.deleted_at IS NULL')
-            .andWhere('version.deleted_at IS NULL')
-            .groupBy('service.id')
-            .getRawOne();
+            .getOne();
 
-        if (isEmptyValue(service)) {
+        if (!service) {
             throw new NotFoundException('Service not found');
         }
 
+        service.no_of_versions = service.versions.length;
         return service;
     }
 
@@ -81,7 +77,7 @@ export class ServicesService {
             searchTerm,
             order = 'DESC',
             sortBy = 'created_at',
-            page: { number: pageNumber = 1, size: pageSize = 20 },
+            page: { number: pageNumber = 1, size: pageSize = 20 } = {},
         } = requestParams!;
         const queryBuilder = this.serviceRepository
             .createQueryBuilder('service')

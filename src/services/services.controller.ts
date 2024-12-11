@@ -30,17 +30,21 @@ import { plainToInstance } from 'class-transformer';
 
 import { ServicesService } from './services.service';
 import {
+    ParticularServiceDto,
+    ParticularServiceResponseDto,
     ServiceDto,
     ServiceListDto,
     ServiceListRequestQuery,
     ServiceListResponseDto,
     ServicePartialRequestBodyDto,
     ServiceRequestBodyDto,
-    ServiceRequestParamsDto,
     ServiceResponseDto,
 } from './dto/services.dto';
 import { isEmptyValue } from 'src/utils';
-import { APIErrorResponse } from 'src/types/common.dto';
+import {
+    APIErrorResponse,
+    ServiceRequestParamsDto,
+} from 'src/types/common.dto';
 import {
     APIInternalServerErrorResponse,
     APINotFoundErrorResponse,
@@ -137,7 +141,7 @@ export class ServicesController {
             'Returns information about a particular service by the service id',
     })
     @ApiOkResponse({
-        type: ServiceResponseDto,
+        type: ParticularServiceResponseDto,
     })
     @ApiNotFoundResponse({
         type: APINotFoundErrorResponse,
@@ -150,11 +154,11 @@ export class ServicesController {
         const serviceEntity =
             await this.servicesService.getServiceById(reqParams);
 
-        const response: ServiceDto = {
+        const response: ParticularServiceDto = {
             entity: serviceEntity,
         };
 
-        return plainToInstance(ServiceDto, response);
+        return plainToInstance(ParticularServiceDto, response);
     }
 
     @ApiOperation({

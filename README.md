@@ -378,6 +378,10 @@ Currently one flow has been implemented to demonstrate the implementation of E2E
    ```bash
    docker-compose up -d
    ```
+3. Run the database seed script to create tables and insert some data
+   ```bash
+   npm run seed-db
+   ```
 
 ### Steps to Set Up - Local Development
 1. Clone the repository:
@@ -396,7 +400,11 @@ Currently one flow has been implemented to demonstrate the implementation of E2E
    ```bash
    docker-compose up -d database_service
    ```
-5. Run the application:
+5. Run the database seed script to create tables and insert some data
+   ```bash
+   npm run seed-db
+   ```
+6. Run the application:
    ```bash
    npm run start:dev
    ```
@@ -426,7 +434,7 @@ The repository is [Commitizen](https://github.com/commitizen/cz-cli) friendly an
 
 ### Swagger - API Documentation
 - Locally Accessible at: `http://localhost:3000/api-docs`
-- Hosted on [SwaggerHub](https://app.swaggerhub.com/apis-docs/NIKHILPINTO97_1/service-catalog/1.0.0)
+- Hosted on [SwaggerHub](https://app.swaggerhub.com/apis-docs/NIKHILPINTO97_1/service-catalog-api/1.0.1)
 
 ![alt text](documentation/readme/images/swagger-api-docs.png)
 

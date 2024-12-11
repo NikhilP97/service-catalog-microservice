@@ -32,7 +32,10 @@ import {
     APINotFoundErrorResponse,
     APIUnauthenticatedExceptionResponse,
 } from 'src/types/swagger.dto';
-import { APIErrorResponse } from 'src/types/common.dto';
+import {
+    APIErrorResponse,
+    ServiceRequestParamsDto,
+} from 'src/types/common.dto';
 import { VersionsService } from './versions.service';
 
 import {
@@ -44,7 +47,6 @@ import {
     VersionResponseDto,
     VersionListResponseDto,
 } from './dto/versions.dto';
-import { ServiceRequestParamsDto } from 'src/services/dto/services.dto';
 
 @ApiTags('Services')
 @ApiBearerAuth()

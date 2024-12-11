@@ -4,13 +4,13 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
+import { ServiceRequestParamsDto } from 'src/types/common.dto';
 import { ServicesService } from './services.service';
 import { ServiceEntity } from './entities/service.entity';
 import {
     ServiceListRequestQuery,
     ServicePartialRequestBodyDto,
     ServiceRequestBodyDto,
-    ServiceRequestParamsDto,
 } from './dto/services.dto';
 
 const mockService: ServiceEntity = {
@@ -87,12 +87,14 @@ describe('ServicesService', () => {
             };
             serviceRepository.createQueryBuilder.mockReturnValue({
                 leftJoin: jest.fn().mockReturnThis(),
+                leftJoinAndSelect: jest.fn().mockReturnThis(),
                 select: jest.fn().mockReturnThis(),
                 addSelect: jest.fn().mockReturnThis(),
                 where: jest.fn().mockReturnThis(),
                 andWhere: jest.fn().mockReturnThis(),
                 groupBy: jest.fn().mockReturnThis(),
                 getRawOne: jest.fn().mockResolvedValue(mockService),
+                getOne: jest.fn().mockResolvedValue(mockService),
             } as any);
 
             // Act
@@ -109,12 +111,14 @@ describe('ServicesService', () => {
             };
             serviceRepository.createQueryBuilder.mockReturnValue({
                 leftJoin: jest.fn().mockReturnThis(),
+                leftJoinAndSelect: jest.fn().mockReturnThis(),
                 select: jest.fn().mockReturnThis(),
                 addSelect: jest.fn().mockReturnThis(),
                 where: jest.fn().mockReturnThis(),
                 andWhere: jest.fn().mockReturnThis(),
                 groupBy: jest.fn().mockReturnThis(),
                 getRawOne: jest.fn().mockResolvedValue(null),
+                getOne: jest.fn().mockResolvedValue(null),
             } as any);
 
             // Act & Assert
@@ -128,11 +132,14 @@ describe('ServicesService', () => {
         it('should return paginated services', async () => {
             // Arrange
             const queryParams: ServiceListRequestQuery = {
-                'page[number]': 1,
-                'page[size]': 10,
+                page: {
+                    number: 1,
+                    size: 20,
+                },
             };
             serviceRepository.createQueryBuilder.mockReturnValue({
                 leftJoin: jest.fn().mockReturnThis(),
+                leftJoinAndSelect: jest.fn().mockReturnThis(),
                 select: jest.fn().mockReturnThis(),
                 addSelect: jest.fn().mockReturnThis(),
                 where: jest.fn().mockReturnThis(),
@@ -141,6 +148,8 @@ describe('ServicesService', () => {
                 orderBy: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 take: jest.fn().mockReturnThis(),
+                limit: jest.fn().mockReturnThis(),
+                offset: jest.fn().mockReturnThis(),
                 getRawMany: jest.fn().mockResolvedValue([mockService]),
                 getCount: jest.fn().mockResolvedValue(1),
             } as any);
@@ -156,12 +165,15 @@ describe('ServicesService', () => {
         it('should return services filtered by searchTerm', async () => {
             // Arrange
             const queryParams: ServiceListRequestQuery = {
-                'page[number]': 1,
-                'page[size]': 10,
+                page: {
+                    number: 1,
+                    size: 10,
+                },
                 searchTerm: 'Mock Service',
             };
             serviceRepository.createQueryBuilder.mockReturnValue({
                 leftJoin: jest.fn().mockReturnThis(),
+                leftJoinAndSelect: jest.fn().mockReturnThis(),
                 select: jest.fn().mockReturnThis(),
                 addSelect: jest.fn().mockReturnThis(),
                 where: jest.fn().mockReturnThis(),
@@ -170,6 +182,8 @@ describe('ServicesService', () => {
                 orderBy: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 take: jest.fn().mockReturnThis(),
+                limit: jest.fn().mockReturnThis(),
+                offset: jest.fn().mockReturnThis(),
                 getRawMany: jest.fn().mockResolvedValue([mockService]),
                 getCount: jest.fn().mockResolvedValue(1),
             } as any);
@@ -185,11 +199,14 @@ describe('ServicesService', () => {
         it('should throw not found exception if no services were found', async () => {
             // Arrange
             const queryParams: ServiceListRequestQuery = {
-                'page[number]': 1,
-                'page[size]': 10,
+                page: {
+                    number: 1,
+                    size: 10,
+                },
             };
             serviceRepository.createQueryBuilder.mockReturnValue({
                 leftJoin: jest.fn().mockReturnThis(),
+                leftJoinAndSelect: jest.fn().mockReturnThis(),
                 select: jest.fn().mockReturnThis(),
                 addSelect: jest.fn().mockReturnThis(),
                 where: jest.fn().mockReturnThis(),
@@ -198,6 +215,8 @@ describe('ServicesService', () => {
                 orderBy: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 take: jest.fn().mockReturnThis(),
+                limit: jest.fn().mockReturnThis(),
+                offset: jest.fn().mockReturnThis(),
                 getRawMany: jest.fn().mockResolvedValue([]),
                 getCount: jest.fn().mockResolvedValue(1),
             } as any);
@@ -223,12 +242,14 @@ describe('ServicesService', () => {
             serviceRepository.update.mockResolvedValue(new UpdateResult());
             serviceRepository.createQueryBuilder.mockReturnValue({
                 leftJoin: jest.fn().mockReturnThis(),
+                leftJoinAndSelect: jest.fn().mockReturnThis(),
                 select: jest.fn().mockReturnThis(),
                 addSelect: jest.fn().mockReturnThis(),
                 where: jest.fn().mockReturnThis(),
                 andWhere: jest.fn().mockReturnThis(),
                 groupBy: jest.fn().mockReturnThis(),
                 getRawOne: jest.fn().mockResolvedValue(mockService),
+                getOne: jest.fn().mockResolvedValue(mockService),
             } as any);
 
             // Act
