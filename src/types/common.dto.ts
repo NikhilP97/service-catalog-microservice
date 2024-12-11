@@ -9,6 +9,7 @@ import {
     IsNumber,
     IsOptional,
     IsString,
+    IsUUID,
     Min,
     ValidateNested,
 } from 'class-validator';
@@ -185,4 +186,18 @@ export class APIErrorResponse {
         example: '["username must be contain only letter and numbers"]',
     })
     details?: undefined | string[];
+}
+
+/**
+ * Need to keep here since it is used in services as well as versions
+ * If not kept here, causes a cyclic dependency between services.dto.ts and versions.dto.ts
+ */
+export class ServiceRequestParamsDto {
+    @ApiProperty({
+        description: 'The unique ID for the entity',
+        example: '0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2',
+    })
+    @IsNotEmpty()
+    @IsUUID()
+    readonly serviceId: string;
 }

@@ -14,6 +14,7 @@ import { ServicesModule } from '../src/services/services.module';
 import { ServiceEntity } from '../src/services/entities/service.entity';
 import { VersionsEntity } from 'src/versions/entities/version.entity';
 import { setup } from 'src/setup';
+import { VersionsModule } from 'src/versions/versions.module';
 
 describe('Services functionality (e2e)', () => {
     let app: INestApplication;
@@ -23,6 +24,7 @@ describe('Services functionality (e2e)', () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [
                 ServicesModule,
+                VersionsModule,
                 TypeOrmModule.forRoot({
                     // NOTE: A postgres DB with these connections must be running for the tests to work as expected
                     type: 'postgres',
@@ -82,6 +84,14 @@ describe('Services functionality (e2e)', () => {
             .get(`/api/v1/services/${createdService.id}`)
             .expect(200);
 
+        const getVersionsForAServiceResponse = await request(
+            app.getHttpServer(),
+        )
+            .get(`/api/v1/services/${createdService.id}/versions`)
+            .expect(200);
+
+        const versions = getVersionsForAServiceResponse.body.data.entities;
+
         // Assert: Validate the response of getting service info by id
         expect(getServiceByIdResponse.body.data).toEqual({
             entity: {
@@ -89,6 +99,7 @@ describe('Services functionality (e2e)', () => {
                 name: 'Test Service Name',
                 description: 'Test Service Description',
                 no_of_versions: 1,
+                versions: versions,
             },
         });
     });

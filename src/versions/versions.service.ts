@@ -12,8 +12,8 @@ import { IsNull, Repository } from 'typeorm';
 import { validateOrReject } from 'class-validator';
 
 import { isEmptyValue } from 'src/utils';
+import { ServiceRequestParamsDto } from 'src/types/common.dto';
 import { VersionsEntity } from './entities/version.entity';
-import { ServiceRequestParamsDto } from 'src/services/dto/services.dto';
 import {
     VersionPartialReqBodyDto,
     VersionRequestBodyDto,

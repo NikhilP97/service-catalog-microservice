@@ -2,13 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { BadRequestException } from '@nestjs/common';
 
+import { ServiceRequestParamsDto } from 'src/types/common.dto';
 import {
     ServiceDto,
     ServiceListDto,
     ServiceListRequestQuery,
     ServicePartialRequestBodyDto,
     ServiceRequestBodyDto,
-    ServiceRequestParamsDto,
 } from './dto/services.dto';
 import { ServicesController } from './services.controller';
 import { ServicesService } from './services.service';
@@ -87,8 +87,10 @@ describe('ServicesController', () => {
         it('Should return a list of services', async () => {
             // Arrange
             const reqQuery: ServiceListRequestQuery = {
-                'page[number]': 1,
-                'page[size]': 10,
+                page: {
+                    number: 1,
+                    size: 10,
+                },
             };
             servicesService.getServices.mockResolvedValue({
                 services: [mockServiceEntity],

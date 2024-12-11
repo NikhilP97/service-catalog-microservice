@@ -49,23 +49,6 @@ paths:
         pagination and sorting
       operationId: ServicesController_findServices_v1
       parameters:
-        - name: page[number]
-          required: false
-          in: query
-          description: The page number to start searching from. Minimum value should be 1
-          schema:
-            minimum: 1
-            default: 1
-            example: 1
-            type: number
-        - name: page[size]
-          required: false
-          in: query
-          description: The amount of items that the API should fetch
-          schema:
-            default: 20
-            example: 20
-            type: number
         - name: searchTerm
           required: false
           in: query
@@ -74,7 +57,7 @@ paths:
             API searches on the name and description fields
           schema:
             default: ''
-            example: Location Service
+            example: ''
             type: string
         - name: order
           required: false
@@ -98,6 +81,22 @@ paths:
               - name
               - created_at
             type: string
+        - name: page[number]
+          required: false
+          in: query
+          description: The page number for pagination
+          schema:
+            default: 1
+            example: 1
+            type: number
+        - name: page[size]
+          required: false
+          in: query
+          description: The number of items per page for pagination
+          schema:
+            default: 20
+            example: 20
+            type: number
       responses:
         '200':
           description: ''
@@ -152,7 +151,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ServiceResponseDto'
+                $ref: '#/components/schemas/ParticularServiceResponseDto'
         '400':
           description: ''
           content:
@@ -866,7 +865,7 @@ components:
         no_of_versions:
           type: number
           description: The no of versions the entity has
-          example: 3
+          example: 1
       required:
         - name
         - description
@@ -974,6 +973,77 @@ components:
         - statusCode
         - title
         - type
+    VersionExposedProperties:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ID for the entity
+          example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+        name:
+          type: string
+          description: The name of entity
+          example: New Version Name
+        overview:
+          type: string
+          description: A brief overview about the version
+          example: Summary of the version
+      required:
+        - id
+        - name
+        - overview
+    ParticularServiceExposedProperties:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of entity
+          example: New Service Name
+        description:
+          type: string
+          description: The description of entity
+          example: Description of the service
+        id:
+          type: string
+          description: The unique ID for the entity
+          example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
+        no_of_versions:
+          type: number
+          description: The no of versions the entity has
+          example: 1
+        versions:
+          description: The information about the version entities
+          type: array
+          items:
+            $ref: '#/components/schemas/VersionExposedProperties'
+      required:
+        - name
+        - description
+        - id
+        - no_of_versions
+        - versions
+    ParticularServiceDto:
+      type: object
+      properties:
+        entity:
+          description: The information about the service entity
+          allOf:
+            - $ref: '#/components/schemas/ParticularServiceExposedProperties'
+      required:
+        - entity
+    ParticularServiceResponseDto:
+      type: object
+      properties:
+        status_code:
+          type: number
+          description: http status code
+        data:
+          description: The base level data key that contains information about the API
+          allOf:
+            - $ref: '#/components/schemas/ParticularServiceDto'
+      required:
+        - status_code
+        - data
     ServicePartialRequestBodyDto:
       type: object
       properties:
@@ -997,25 +1067,6 @@ components:
           description: A brief overview about the version
           example: Summary of the version
       required:
-        - name
-        - overview
-    VersionExposedProperties:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The unique ID for the entity
-          example: 0e4bdfc0-bae7-43c0-bd67-a95f2ef2b4f2
-        name:
-          type: string
-          description: The name of entity
-          example: New Version Name
-        overview:
-          type: string
-          description: A brief overview about the version
-          example: Summary of the version
-      required:
-        - id
         - name
         - overview
     VersionDto:
